@@ -2,7 +2,7 @@
 
 source "https://rubygems.org"
 ruby RUBY_VERSION
-
+gem 'json', '>= 2.0'
 require 'json'
 require 'open-uri'
 versions = JSON.parse(open('https://pages.github.com/versions.json').read)
