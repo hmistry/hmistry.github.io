@@ -16,12 +16,13 @@
 title: Hiren Mistry
 # email: your-email@example.com
 description: > # this means to ignore newlines until "baseurl:"
-  This is my personal blog where I write about my projects
-  and various things of interest to me.
+  This is my personal blog where I write about my projects.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://hmistry.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: hmistry0
 github_username:  hmistry
+linkedin_username:  hmistry2
+google_analytics: UA-107875946-1
 
 # Build settings
 markdown: kramdown
@@ -40,3 +41,7 @@ plugins:
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+
+
+# Pagination
+# https://github.com/jekyll/minima/issues/159
