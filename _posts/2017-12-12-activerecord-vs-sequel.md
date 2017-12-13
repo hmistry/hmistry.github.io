@@ -19,6 +19,7 @@ I ran some benchmarking tests to evaluate the performance difference, if any, be
 4. The database schema had 3 models - topic, post, and comment. Topic has many posts and post has many comments. The database was seeded with 10 topics, 100 posts, and 20,000 comments.
 5. Ran the test on SQLite3 and PostgreSQL. Both were setup with a local database file like a normal application.
 6. Both ORM's had to write to a log file like they would in a real world application. Logging did affect the speed - made it slower.
+7. Code is available on Github [here](https://github.com/hmistry/ar_sql).
 
 <br>
 ## Conclusion:
