@@ -103,3 +103,24 @@ table {
 .col-width-reg {
   width: 90px;
 }
+
+.post-width-image {
+    width: 60%;
+    @include media-query($on-palm) {
+      width: 100%;
+    }
+}
+
+.post-halfwidth-image {
+    width: 47%;
+    @include media-query($on-palm) {
+      width: 100%;
+    }
+}
+
+.post-halfwidth-image-left {
+    margin-right: $spacing_unit * 1.2;
+    @include media-query($on-palm) {
+      margin-right: 0;
+    }
+}
