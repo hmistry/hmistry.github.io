@@ -11,9 +11,16 @@ I ran some benchmarking tests to evaluate the performance difference, if any, be
 <!--more-->
 
 **Updated:** (2017-12-27) I updated the benchmarks to account for ActiveRecord lazily typecasting data on attribute access and Sequel typecasting immediately on retrieval from the database. For an apples-to-apples comparison, the benchmarks now force ActiveRecord to typecast the data so the total computation time and memory used is accounted for in the results for both ORM's. I also added a set of benchmarks for Sequel with `sequel_pg` gem for PostgreSQL database - the `sequel_pg` gem replaces the Sequel postgres adapter row fetching and typecasting code with a C version that improves the performance.
+{: #updated-note}
+<br>
+#### Contents:
+- [Setup](#setup)
+- [Results](#results)
+- [Conclusion](#conclusion)
 
 <br>
 ## Setup
+{: #setup}
 1. All the tests were done on a local machine (2013 MacBook Pro) i.e. both the database and ruby script ran on the same machine for simplicity and time.
 2. Versions used: Ruby v2.4.2, ActiveRecord v5.1.4, Sequel v5.2.0, SQLite v3.16.0, and PostgreSQL v9.6.5.
 3. Used `benchmark-ips` and `memory_profiler` gems to obtain performance measurements.
@@ -30,6 +37,7 @@ I ran some benchmarking tests to evaluate the performance difference, if any, be
 
 <br>
 ## Results:
+{: #results}
 Things to note:
 - Speed performance - results are shown for both PostgreSQL and SQLite3 databases.
 - Speed is measured in iterations per second, except load time which is in seconds. Higher is better for iterations per second and lower is better for seconds (load time).
@@ -42,7 +50,16 @@ Sql => Sequel gem v5.2.0<br>
 Sql + sql_pg => Sequel gem v5.2.0 + Sequel_pg gem v1.8.1 (for PostgreSQL database only)<br>
 
 <br>
+**Tests:**<br>
+1. [Loading the ORM](#loading)
+2. [Creating records](#creating)
+3. [Updating records](#updating)
+4. [Querying records](#querying)
+5. [Queries - Lazy typecasting & Timestamps](#typecasting)
+
+<br>
 ### 1. Loading the ORM
+{: #loading}
 Sequel beats ActiveRecord by ~3x in both speed and memory in loading.
 - It loads in 0.1s vs 0.3s for ActiveRecord.
 - It allocates 6Mb in memory vs 20Mb for ActiveRecord.
@@ -69,6 +86,7 @@ The very first use of any ActiveRecord query (after require) allocates more memo
 
 <br>
 ### 2. Creating records
+{: #creating}
 Measured two aspects in creating a record - one without validations and the other with a presence validation.
 - There is little performance degradation due to the validation but this is a simple validation.
 
@@ -105,6 +123,7 @@ Using PostgreSQL:
 
 <br>
 ### 3. Updating records
+{: #updating}
 Measured two different methods of updating a record - one with a hash argument to update an attribute, and the other used method assignment then save to update the record.
 - There is little performance difference between the two update methodologies.
 
@@ -140,7 +159,8 @@ Using PostgreSQL:
 
 <br>
 ### 4. Querying records
-Querying records revealed some implementation differences in the ORM's and added some complexity to the benchmarking. For an apples-to-apples comparison, these benchmarks force the ORM's to typecast the data (if you missed the reason, see the updated note above). Measured the following methods of querying the database (AR method / Sequel method):
+{: #querying}
+Querying records revealed some implementation differences in the ORM's and added some complexity to the benchmarking. For an apples-to-apples comparison, these benchmarks force the ORM's to typecast the data (if you missed the reason, see the [updated note](#updated-note) above). Measured the following methods of querying the database (AR method / Sequel method):
 - `#find(id) / #[id]`
 - `#findby() / #find()`
 - `#where()`
@@ -172,7 +192,7 @@ Using PostgreSQL:
 ![Load Time]({{ "/assets/images/postwo-pg-ips.png" | absolute_url }}){: .post-halfwidth-image }
 
 <br>
-SQLite3 Results shown in next section (#5).
+SQLite3 Results shown in next [section #5](#typecasting).
 
 <br>
 **ORM Memory Usage**
@@ -204,6 +224,7 @@ Using PostgreSQL:
 
 <br>
 ### 5. Queries - Lazy typecasting & Timestamps
+{: #typecasting}
 These benchmarks explore:
 - ActiveRecord's defered typecasting gain/impact on performance (measured the same queries as above - only SQLite3 ones are shown here).
 - Typecasting timestamps are slow and is the cause of Sequel slower performance in the one query above.
@@ -244,6 +265,7 @@ Using SQLite3:
 
 <br>
 ## Conclusion:
+{: #conclusion}
 Summarizing the benchmark results:
 - In loading, Sequel beats ActiveRecord by ~3x in speed and memory.
 - In creating new records, Sequel performs 1.2x-2x better than ActiveRecord in speed and uses less memory.
