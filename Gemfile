@@ -6,7 +6,7 @@ gem 'json', '>= 2.0'
 require 'json'
 require 'open-uri'
 versions = JSON.parse(open('https://pages.github.com/versions.json').read)
-# versions = '171'
+# versions = '202'
 
 # gem "jekyll", "~> 3.5.1"
 
