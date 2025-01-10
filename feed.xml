@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2025-01-10T07:34:50+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
+</subtitle><entry><title type="html">Using CDN to improve file uploads</title><link href="http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads.html" rel="alternate" type="text/html" title="Using CDN to improve file uploads" /><published>2020-09-29T00:00:00+00:00</published><updated>2020-09-29T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads</id><content type="html" xml:base="http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads.html"><![CDATA[<p>For one of my client projects, I explored different ways to increase upload speeds for large files uploaded from a desktop computer to AWS S3. The desktop computer was located in a different country, halfway around the world, with a throttled/restrictive outbound internet connection to the S3 storage located in the US region. One approach is doing parallel uploads but the focus was on how to get a faster connection.</p>
+
+<p>I discovered 3 ways to architect file uploads to AWS S3:
+<!--more--></p>
+
+<ol>
+  <li>
+    <p>Standard mode
+In this mode, you setup a bucket in S3 in a specified region with all the default settings and the client uploads the files to the S3 region directly no matter where the client is located in the world. This is the most simplest setup. The file upload speed will greatly depend on quality of the entire connection and ping times will depend on the distance to the storage.</p>
+  </li>
+  <li>
+    <p>S3 Accelerated mode
+You create a bucket like you normally do in #1 above but you check the box for file acceleration. This allows a client device to connect to the nearest S3 location and then uses the AWS hi-speed backbone connection to the specified S3 bucket region. The upload speed will depend on the quality of the connection between the client and the nearest S3 location as we can assume AWS inter-region connection is a high bandwidth pipe that won’t be the limiting factor. You might experience slights delays for S3 to synchronize files between regions. This is very easy to implement however there are additional costs (see AWS S3 pricing) to use this.</p>
+  </li>
+  <li>
+    <p>Using Cloudfront or a CDN as an edge location
+This was an interesting idea and a different use case of a CDN. A CDN is normally used to cache assets so clients all the world will have a closer location to download the assets resulting in faster download times. However instead of using a CDN to cache asset files for clients to download, we can use it as an edge location for client devices to connect to, and then transport the stream to the specified S3 location using larger high bandwidth connections. It is essentially the same as #2 above, but you’re not limited to S3 locations and CDN’s can have more locations for clients to connect to. The CDN does not buffer or store the file, it is simply allowing the data stream to pass through it to the end destination. There are additional costs to using CDN’s and the setup is more involved requiring knowledge on how to configure the CDN and AWS to accept connections from it.</p>
+  </li>
+</ol>
+
+<h3 id="results">Results</h3>
+
+<p>Unfortunately, none of these solutions resulted in any significant speed improvements over the standard mode (#1) most likely due to the country where the desktop computer was located. Also, AWS did not own any servers located in that country and as such the restrictive outbound connection to the nearest S3 location or CDN was probably the bottleneck.</p>
+
+<p>However if we were doing file uploads in a different country that didn’t have a restrictive outbound connection, I think the S3 Accelerated mode or using the CDN method would have resulted in a potential improvement in upload speeds and is worth exploring.</p>]]></content><author><name></name></author><category term="software" /><category term="ruby" /><category term="performance" /><summary type="html"><![CDATA[For one of my client projects, I explored different ways to increase upload speeds for large files uploaded from a desktop computer to AWS S3. The desktop computer was located in a different country, halfway around the world, with a throttled/restrictive outbound internet connection to the S3 storage located in the US region. One approach is doing parallel uploads but the focus was on how to get a faster connection. I discovered 3 ways to architect file uploads to AWS S3:]]></summary></entry><entry><title type="html">Writing a Git Commit Message</title><link href="http://hmistry.github.io/software/2018/02/18/writing-a-git-commit-message.html" rel="alternate" type="text/html" title="Writing a Git Commit Message" /><published>2018-02-18T00:00:00+00:00</published><updated>2018-02-18T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2018/02/18/writing-a-git-commit-message</id><content type="html" xml:base="http://hmistry.github.io/software/2018/02/18/writing-a-git-commit-message.html"><![CDATA[<p>This is a summary of Chris Beams’ post on <a href="https://chris.beams.io/posts/git-commit/">“How to Write a Git Commit Message”</a> for the purpose of being my quick reference. (As Chris mentions: “This has all been said before” - see his references.)</p>
+
+<p><br /></p>
+<h3 id="guidelines">Guidelines</h3>
+<ol>
+  <li><a href="#separate">Separate subject from body with a blank line</a></li>
+  <li><a href="#limit">Limit the subject line to 50 characters, with hard limit at 72</a></li>
+  <li><a href="#capitalize">Capitalize the subject line</a></li>
+  <li><a href="#period">Do not end the subject line with a period</a></li>
+  <li><a href="#imperative">Use the imperative mood in the subject line</a></li>
+  <li><a href="#wrap">Wrap the body at 72 characters</a></li>
+  <li><a href="#body">Use the body to explain <em>what and why</em> vs. <em>how</em></a>
+<!--more--></li>
+</ol>
+
+<p><br /></p>
+<h4 id="separate">1. Separate subject from body with a blank line</h4>
+<ul>
+  <li>Blank line separation is needed for some Git commands to work better in short form</li>
+  <li>Use a text editor instead of the CLI -m option. To setup an editor for use with Git CLI, see <a href="https://git-scm.com/book/en/v2/Customizing-Git-Git-Configuration">this section of Pro Git</a>.</li>
+</ul>
+
+<p><br /></p>
+<h4 id="limit">2. Limit the subject line to 50 characters, with hard limit at 72</h4>
+<ul>
+  <li>GitHub’s UI truncates any subject line longer than 72 characters with an ellipsis</li>
+  <li>Git log one-liner or shortlog works better with approx 50 chars</li>
+</ul>
+
+<p><br /></p>
+<h4 id="capitalize">3. Capitalize the subject line</h4>
+
+<p><br /></p>
+<h4 id="period">4. Do not end the subject line with a period</h4>
+
+<p><br /></p>
+<h4 id="imperative">5. Use the imperative mood in the subject line</h4>
+<ul>
+  <li>Imperative mood means “spoken or written as if giving a command or instruction” e.g. clean your room, or close the door</li>
+  <li>A Git commit subject line should be able to complete the following sentence:
+    <ul>
+      <li>If applied, this commit will <strong><em>your subject line here</em></strong></li>
+      <li>If applied, this commit will <em>refactor subsystem X for readability</em></li>
+    </ul>
+  </li>
+</ul>
+
+<p><br /></p>
+<h4 id="wrap">6. Wrap the body at 72 characters</h4>
+
+<p><br /></p>
+<h4 id="body">7. Use the body to explain <em>what and why</em> vs. <em>how</em></h4>
+<ul>
+  <li>Focus on clarifying the reasons why you made the change in the first place — <em>the way things worked before the change and what was wrong with that</em>, <em>the way they work now</em>, and <em>why you decided to solve it the way you did</em>.</li>
+</ul>
+
+<p><br /></p>
+<h4 id="commit-template">Commit template</h4>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">Summarize changes <span class="k">in </span>around 50 characters or less
+
+More detailed explanatory text, <span class="k">if </span>necessary. Wrap it to about 72
+characters or so. In some contexts, the first line is treated as the
+subject of the commit and the rest of the text as the body. The
+blank line separating the summary from the body is critical <span class="o">(</span>unless
+you omit the body entirely<span class="o">)</span><span class="p">;</span> various tools like <span class="sb">`</span>log<span class="sb">`</span>, <span class="sb">`</span>shortlog<span class="sb">`</span>
+and <span class="sb">`</span>rebase<span class="sb">`</span> can get confused <span class="k">if </span>you run the two together.
+
+Explain the problem that this commit is solving. Focus on why you
+are making this change as opposed to how <span class="o">(</span>the code explains that<span class="o">)</span><span class="nb">.</span>
+Are there side effects or other unintuitive consequences of this
+change? Here is the place to explain them.
+
+Further paragraphs come after blank lines.
+
+ - Bullet points are okay, too
+
+ - Typically a hyphen or asterisk is used <span class="k">for </span>the bullet, preceded
+   by a single space, with blank lines <span class="k">in </span>between, but conventions
+   vary here
+
+If you use an issue tracker, put references to them at the bottom,
+like this:
+
+Resolves: <span class="c">#123</span>
+See also: <span class="c">#456, #789</span></code></pre></figure>]]></content><author><name></name></author><category term="software" /><category term="git" /><summary type="html"><![CDATA[This is a summary of Chris Beams’ post on “How to Write a Git Commit Message” for the purpose of being my quick reference. (As Chris mentions: “This has all been said before” - see his references.) Guidelines Separate subject from body with a blank line Limit the subject line to 50 characters, with hard limit at 72 Capitalize the subject line Do not end the subject line with a period Use the imperative mood in the subject line Wrap the body at 72 characters Use the body to explain what and why vs. how]]></summary></entry><entry><title type="html">ActiveRecord vs Sequel Performance</title><link href="http://hmistry.github.io/software/2017/12/11/activerecord-vs-sequel.html" rel="alternate" type="text/html" title="ActiveRecord vs Sequel Performance" /><published>2017-12-11T00:00:00+00:00</published><updated>2017-12-11T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2017/12/11/activerecord-vs-sequel</id><content type="html" xml:base="http://hmistry.github.io/software/2017/12/11/activerecord-vs-sequel.html"><![CDATA[<p>I ran some benchmarking tests to evaluate the performance difference, if any, between ActiveRecord and Sequel ORM’s - two common ORM’s in the Ruby world. I measured two sets of benchmarks: speed, and memory consumed. In addition, each set was measured against two different databases: SQLite3, and PostgreSQL. The results are summarized below.
+<!--more--></p>
+
+<p id="updated-note"><strong>Updated:</strong> (2017-12-27) I updated the benchmarks to account for ActiveRecord lazily typecasting data on attribute access and Sequel typecasting immediately on retrieval from the database. For an apples-to-apples comparison, the benchmarks now force ActiveRecord to typecast the data so the total computation time and memory used is accounted for in the results for both ORM’s. I also added a set of benchmarks for Sequel with <code class="language-plaintext highlighter-rouge">sequel_pg</code> gem for PostgreSQL database - the <code class="language-plaintext highlighter-rouge">sequel_pg</code> gem replaces the Sequel postgres adapter row fetching and typecasting code with a C version that improves the performance.</p>
+<p><br /></p>
+<h4 id="contents">Contents:</h4>
+<ul>
+  <li><a href="#setup">Setup</a></li>
+  <li><a href="#results">Results</a></li>
+  <li><a href="#conclusion">Conclusion</a></li>
+</ul>
+
+<p><br /></p>
+<h2 id="setup">Setup</h2>
+<ol>
+  <li>All the tests were done on a local machine (2013 MacBook Pro) i.e. both the database and ruby script ran on the same machine for simplicity and time.</li>
+  <li>Versions used: Ruby v2.4.2, ActiveRecord v5.1.4, Sequel v5.2.0, SQLite v3.16.0, and PostgreSQL v9.6.5.</li>
+  <li>Used <code class="language-plaintext highlighter-rouge">benchmark-ips</code> and <code class="language-plaintext highlighter-rouge">memory_profiler</code> gems to obtain performance measurements.</li>
+  <li>Ran the test on SQLite3 and PostgreSQL databases.</li>
+  <li>The database schema had 3 models - Topic, Post, and Comment - with the following relations - topic has many posts and post has many comments. The database was seeded with 10 topics, 100 posts, and 20,000 comments.</li>
+  <li>Both ORM’s were configured to write a log file like in a real world application. Logging did affect the speed - made it slower.</li>
+  <li>Benchmark code is available on Github <a href="https://github.com/hmistry/ar_sql">here</a>.</li>
+  <li>The tests are grouped as follows:
+    <ol>
+      <li>Loading the ORM</li>
+      <li>Creating records</li>
+      <li>Updating records</li>
+      <li>Querying records</li>
+      <li>Queries - Lazy typecasting &amp; Timestamps</li>
+    </ol>
+  </li>
+</ol>
+
+<p><br /></p>
+<h2 id="results">Results:</h2>
+<p>Things to note:</p>
+<ul>
+  <li>Speed performance - results are shown for both PostgreSQL and SQLite3 databases.</li>
+  <li>Speed is measured in iterations per second, except load time which is in seconds. Higher is better for iterations per second and lower is better for seconds (load time).</li>
+  <li>Memory usage performance - only results for PostgreSQL are shown because results for SQLite3 were very similar and did not offer much insights.</li>
+  <li>Memory is measured in bytes and number of objects for memory allocated and retained (total of 4 measurements). Lower is better for memory allocation and retention.</li>
+</ul>
+
+<p><strong>Key:</strong><br />
+AR =&gt; ActiveRecord gem v5.1.4<br />
+Sql =&gt; Sequel gem v5.2.0<br />
+Sql + sql_pg =&gt; Sequel gem v5.2.0 + Sequel_pg gem v1.8.1 (for PostgreSQL database only)<br /></p>
+
+<p><br />
+<strong>Tests:</strong><br /></p>
+<ol>
+  <li><a href="#loading">Loading the ORM</a></li>
+  <li><a href="#creating">Creating records</a></li>
+  <li><a href="#updating">Updating records</a></li>
+  <li><a href="#querying">Querying records</a></li>
+  <li><a href="#typecasting">Queries - Lazy typecasting &amp; Timestamps</a></li>
+</ol>
+
+<p><br /></p>
+<h3 id="loading">1. Loading the ORM</h3>
+<p>Sequel beats ActiveRecord by ~3x in both speed and memory in loading.</p>
+<ul>
+  <li>It loads in 0.1s vs 0.3s for ActiveRecord.</li>
+  <li>It allocates 6Mb in memory vs 20Mb for ActiveRecord.</li>
+  <li>It doesn’t defer any memory allocation to the first query run unlike ActiveRecord which defers further memory allocation of 200Kb to the first query run (after require). A typical ActiveRecord query is in the 10’s Kb (in this test scenario).</li>
+</ul>
+
+<p><br />
+<strong>ORM Load Time</strong></p>
+
+<p><img src="http://hmistry.github.io/assets/images/load-time.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<strong>ORM Memory Usage</strong></p>
+
+<p><img src="http://hmistry.github.io/assets/images/load-mem.png" alt="Load Memory" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/load-obj.png" alt="Load Memory" class="post-halfwidth-image" /></p>
+
+<p><br />
+<strong>ActiveRecord First Run Memory Usage</strong>
+<br />
+The very first use of any ActiveRecord query (after require) allocates more memory than subsequent queries. This does not happen in Sequel.</p>
+
+<p><img src="http://hmistry.github.io/assets/images/init-run-mem.png" alt="First Run Memory" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/init-run-obj.png" alt="First Run Memory" class="post-halfwidth-image" /></p>
+
+<p><br /></p>
+<h3 id="creating">2. Creating records</h3>
+<p>Measured two aspects in creating a record - one without validations and the other with a presence validation.</p>
+<ul>
+  <li>There is little performance degradation due to the validation but this is a simple validation.</li>
+</ul>
+
+<p>Sequel performs better than ActiveRecord in both speed and memory for creating records.</p>
+<ul>
+  <li>It is 1.8x-2x faster for PostgreSQL and 1.2x faster for SQLite3.</li>
+  <li>It’s memory allocation is lower and memory retention is significantly lower than ActiveRecord (see charts).</li>
+</ul>
+
+<p><br />
+<strong>ORM Speed Performance</strong></p>
+
+<p>Using PostgreSQL:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/create-pg-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/create-val-pg-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+Using SQLite3:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/create-sq3-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/create-val-sq3-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<strong>ORM Memory Usage</strong></p>
+
+<p>Using PostgreSQL:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/create-pg-mem.png" alt="Load Memory" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/create-pg-obj.png" alt="Load Memory" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/create-val-pg-mem.png" alt="Load Memory" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/create-val-pg-obj.png" alt="Load Memory" class="post-halfwidth-image" /></p>
+
+<p><br /></p>
+<h3 id="updating">3. Updating records</h3>
+<p>Measured two different methods of updating a record - one with a hash argument to update an attribute, and the other used method assignment then save to update the record.</p>
+<ul>
+  <li>There is little performance difference between the two update methodologies.</li>
+</ul>
+
+<p>Sequel performs better than ActiveRecord in both speed and memory for updating records.</p>
+<ul>
+  <li>It is 1.7x-2x faster.</li>
+  <li>It’s memory allocation is less than half of ActiveRecord and memory retention is 6x-8x lower than ActiveRecord.</li>
+</ul>
+
+<p><br />
+<strong>ORM Speed Performance</strong></p>
+
+<p>Using PostgreSQL:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/update-pg-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/update2-pg-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+Using SQLite3:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/update-sq3-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/update2-sq3-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<strong>ORM Memory Usage</strong></p>
+
+<p>Using PostgreSQL:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/update-pg-mem.png" alt="Load Memory" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/update-pg-obj.png" alt="Load Memory" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/update2-pg-mem.png" alt="Load Memory" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/update2-pg-obj.png" alt="Load Memory" class="post-halfwidth-image" /></p>
+
+<p><br /></p>
+<h3 id="querying">4. Querying records</h3>
+<p>Querying records revealed some implementation differences in the ORM’s and added some complexity to the benchmarking. For an apples-to-apples comparison, these benchmarks force the ORM’s to typecast the data (if you missed the reason, see the <a href="#updated-note">updated note</a> above). Measured the following methods of querying the database (AR method / Sequel method):</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">#find(id) / #[id]</code></li>
+  <li><code class="language-plaintext highlighter-rouge">#findby() / #find()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">#where()</code></li>
+  <li><code class="language-plaintext highlighter-rouge">#first</code></li>
+  <li>Eager load associated model, <code class="language-plaintext highlighter-rouge">#where().includes() / #where().eager()</code> (retrieves 1 + 100 records)</li>
+  <li><code class="language-plaintext highlighter-rouge">#where().order()</code> query (retrieves 50 records)</li>
+</ul>
+
+<p>Sequel generally performed better than ActiveRecord in both speed and memory except for one query.</p>
+<ul>
+  <li>It is 1.1x-2x faster without <code class="language-plaintext highlighter-rouge">sequel_pg</code> except for one query where it is 20% slower.</li>
+  <li>It’s memory allocation and retention is less than ActiveRecord in all but one query.</li>
+  <li>Sequel with <code class="language-plaintext highlighter-rouge">sequel_pg</code> is 1.6x-3.8x faster than ActiveRecord.</li>
+  <li>Sequel with <code class="language-plaintext highlighter-rouge">sequel_pg</code> is significantly lower in memory allocation and has similar, if not same, memory retention as sequel.</li>
+</ul>
+
+<p><br />
+<strong>ORM Speed Performance</strong></p>
+
+<p>Using PostgreSQL:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/find-pg-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/findby-pg-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/where-pg-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/first-pg-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/eager-pg-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/postwo-pg-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+SQLite3 Results shown in next <a href="#typecasting">section #5</a>.</p>
+
+<p><br />
+<strong>ORM Memory Usage</strong></p>
+
+<p>Using PostgreSQL:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/find-pg-mem.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/find-pg-obj.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/findby-pg-mem.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/findby-pg-obj.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/where-pg-mem.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/where-pg-obj.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/first-pg-mem.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/first-pg-obj.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/eager-pg-mem.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/eager-pg-obj.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/postwo-pg-mem.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/postwo-pg-obj.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br /></p>
+<h3 id="typecasting">5. Queries - Lazy typecasting &amp; Timestamps</h3>
+<p>These benchmarks explore:</p>
+<ul>
+  <li>ActiveRecord’s defered typecasting gain/impact on performance (measured the same queries as above - only SQLite3 ones are shown here).</li>
+  <li>Typecasting timestamps are slow and is the cause of Sequel slower performance in the one query above.</li>
+</ul>
+
+<p>Lazy typecasting gain/impact:</p>
+<ul>
+  <li>Sequel has the same performance whether you force typecasting through attribute access or not.</li>
+  <li>ActiveRecord shows a 10-50% reduction in speed due to deferred typecasting when you access the attribute data.</li>
+  <li>It is interesting that even with this optimization, ActiveRecord still looses to Sequel in some queries.</li>
+</ul>
+
+<p>Retrieving timestamps impact:</p>
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">#where().order()</code> query performance without retrieving timestamp data increases 1.9x for ActiveRecord and 5.8x for Sequel.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">#where().order()</code> query performance of retrieving the timestamp data only (nothing else) is close to retrieving the full record data for both ORM’s.</li>
+  <li>This shows that the low performance of <code class="language-plaintext highlighter-rouge">#where().order()</code> query is correlated to retrieving timestamp data for the 50 records.</li>
+</ul>
+
+<p><br />
+<strong>ORM query performance</strong></p>
+
+<p>Using SQLite3:</p>
+
+<p><img src="http://hmistry.github.io/assets/images/find-sq3-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/findby-sq3-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/where-sq3-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/first-sq3-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/eager-sq3-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/postwo-sq3-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br />
+<strong>Timestamps performance cost in <code class="language-plaintext highlighter-rouge">#where().order()</code> query</strong></p>
+
+<p><br />
+<img src="http://hmistry.github.io/assets/images/postwo-sq3-ips.png" alt="Load Time" class="post-halfwidth-image post-halfwidth-image-left" />
+<img src="http://hmistry.github.io/assets/images/postwo2-sq3-ips.png" alt="Load Time" class="post-halfwidth-image" /></p>
+
+<p><br /></p>
+<h2 id="conclusion">Conclusion:</h2>
+<p>Summarizing the benchmark results:</p>
+<ul>
+  <li>In loading, Sequel beats ActiveRecord by ~3x in speed and memory.</li>
+  <li>In creating new records, Sequel performs 1.2x-2x better than ActiveRecord in speed and uses less memory.</li>
+  <li>In updating records, Sequel performs 1.7x-2x better than ActiveRecord in speed and uses less than half the memory.</li>
+  <li>In querying:
+    <ul>
+      <li>Sequel without <code class="language-plaintext highlighter-rouge">sequel_pg</code> is 1.1x-2x faster than ActiveRecord except for one query where it is 20% slower.</li>
+      <li>Sequel memory allocation and retention is less than ActiveRecord in all but one query.</li>
+      <li>Sequel with <code class="language-plaintext highlighter-rouge">sequel_pg</code> is 1.6x-3.8x faster than ActiveRecord.</li>
+      <li>Sequel with <code class="language-plaintext highlighter-rouge">sequel_pg</code> is significantly lower in memory allocation and has similar, if not same, memory retention as sequel (which is lower than ActiveRecord).</li>
+      <li>Retrieving timestamp data can impact speed performance significantly for both ORM’s.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>In conclusion, the overall performance of Sequel is much better than ActiveRecord both in speed and memory usage by a good margin. The lower memory usage also helps to reduce garbage collection overhead in an application. I liked the fact Sequel does not defer some object allocation when loading the library, and it immediately typecasts the data on retrieval when querying. This means once the query is executed, the data is ready for consumption. A side note on querying - typecasting timestamps are slow so consider excluding it when retrieving records from the database for performance critical queries. Lastly, I was quite impressed with the significant performance boost of Sequel with the <code class="language-plaintext highlighter-rouge">sequel_pg</code> addon used with PostgreSQL databases - it’s definitely a must use addon, especially when the only thing you have to do is add it to the <code class="language-plaintext highlighter-rouge">Gemfile</code>!</p>]]></content><author><name></name></author><category term="software" /><category term="ruby" /><category term="gems" /><category term="performance" /><summary type="html"><![CDATA[I ran some benchmarking tests to evaluate the performance difference, if any, between ActiveRecord and Sequel ORM’s - two common ORM’s in the Ruby world. I measured two sets of benchmarks: speed, and memory consumed. In addition, each set was measured against two different databases: SQLite3, and PostgreSQL. The results are summarized below.]]></summary></entry><entry><title type="html">Cleaning Xcode files</title><link href="http://hmistry.github.io/software/2017/10/09/cleaning-xcode-files.html" rel="alternate" type="text/html" title="Cleaning Xcode files" /><published>2017-10-09T00:00:00+00:00</published><updated>2017-10-09T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2017/10/09/cleaning-xcode-files</id><content type="html" xml:base="http://hmistry.github.io/software/2017/10/09/cleaning-xcode-files.html"><![CDATA[<p>This is a summary from the following articles on recovering disk space from Xcode:</p>
+<ol>
+  <li><a href="http://ajithrnayak.com/post/95441624221/xcode-users-can-free-up-space-on-your-mac">Xcode users can free up space on your Mac by Ajith Nayak</a></li>
+  <li><a href="http://blog.neverthesamecolor.net/how-to-recover-disk-space-from-xcode/">How To Recover Disk Space From Xcode by Sascha Holesch</a></li>
+</ol>
+
+<p><br /></p>
+<h4 id="1-derived-data">1. Derived Data</h4>
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">~/Library/Developer/Xcode/DerivedData/</code>
+<br />
+<strong>Purpose:</strong> Contains data about the projects which includes index, build output, debug/release built targets, and logs. Data can be recreated.
+<br />
+<!--more-->
+<strong>Delete:</strong> Safe to delete. Can be done through Xcode Projects or in Finder by deleting the folders of projects no longer needed.</p>
+
+<p><br /></p>
+<h4 id="2-archives">2. Archives</h4>
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">~/Library/Developer/Xcode/Archives/</code>
+<br />
+<strong>Purpose:</strong> Project targets created for beta testing or App Store submissions are archived. The dSYM data is crucial for debugging crash reports.
+<br />
+<strong>Delete:</strong> Not safe to delete if you need the dSYM data. Can be done through Xcode Organizer or in Finder by deleting the folders of projects no longer needed - be sure to only delete if you don’t need the dSYM data.</p>
+
+<p><br /></p>
+<h4 id="3-ios-device-support">3. iOS Device Support</h4>
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">~/Library/Developer/Xcode/iOS DeviceSupport/</code>
+<br />
+<strong>Purpose:</strong> Contains data stored for every device with every iOS version combination used in development. Initial device connection takes longer to copy all this info. Data can be recreated by connecting device to Mac.
+<br />
+<strong>Delete:</strong> Safe to delete. Use Finder to delete the folders of device with iOS version no longer needed.</p>
+
+<p><br /></p>
+<h4 id="4-core-simulator">4. Core Simulator</h4>
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">~/Library/Developer/Xcode/CoreSimulator/Devices/</code>
+<br />
+<strong>Purpose:</strong> Contains simulators for each version of iOS + device and represented by UUID’s which can be deciphered using the file <code class="language-plaintext highlighter-rouge">.default_created.plist</code>.
+<br />
+<strong>Delete:</strong> Safe to delete. Can be done through Xcode Projects or in Finder by deleting the folders of projects no longer needed.</p>
+
+<p><br /></p>
+<h4 id="5-documentation">5. Documentation</h4>
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">~/Library/Developer/Shared/Documentation/DocSets/</code>
+<br />
+<strong>Purpose:</strong> Contains documentation sets stored for Xcode.
+<br />
+<strong>Delete:</strong> Safe to delete. Delete file in Finder.</p>
+
+<p><br /></p>
+<h4 id="6-cache">6. Cache</h4>
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">~/Library/Caches/com.apple.dt.Xcode</code>
+<br />
+<strong>Purpose:</strong> Some kind of Xcode cache in form of a packaged file. File size is relatively small.
+<br />
+<strong>Delete:</strong> Safe to delete. Delete file in Finder.</p>
+
+<p><br /></p>
+<h4 id="7-device-backup">7. Device Backup</h4>
+<p><strong>Location:</strong> <code class="language-plaintext highlighter-rouge">~/Library/Application Support/MobileSync/Backup/</code>
+<br />
+<strong>Purpose:</strong> Contains a backup sync data of some files and settings of an iOS device that was connected to Mac. This maybe a legacy thing because it’s related to iTunes mobile device sync. Needs verification.
+<br />
+<strong>Delete:</strong> Safe to delete through iTunes device section in preference if you don’t need it.</p>]]></content><author><name></name></author><category term="software" /><category term="xcode" /><summary type="html"><![CDATA[This is a summary from the following articles on recovering disk space from Xcode: Xcode users can free up space on your Mac by Ajith Nayak How To Recover Disk Space From Xcode by Sascha Holesch 1. Derived Data Location: ~/Library/Developer/Xcode/DerivedData/ Purpose: Contains data about the projects which includes index, build output, debug/release built targets, and logs. Data can be recreated.]]></summary></entry><entry><title type="html">Hello Universe!</title><link href="http://hmistry.github.io/misc/2017/10/01/hello-universe.html" rel="alternate" type="text/html" title="Hello Universe!" /><published>2017-10-01T00:00:00+00:00</published><updated>2017-10-01T00:00:00+00:00</updated><id>http://hmistry.github.io/misc/2017/10/01/hello-universe</id><content type="html" xml:base="http://hmistry.github.io/misc/2017/10/01/hello-universe.html"><![CDATA[<figure class="highlight"><pre><code class="language-ruby" data-lang="ruby">  <span class="nb">puts</span> <span class="s2">"Hello Universe!"</span></code></pre></figure>
+
+<p>Stay tuned… 😃</p>
+
+<p>Testing the timeago plugin on GitHub Pages</p>
+
+<ul>
+  <li>Original date - 2020-04-13T10:20:00Z</li>
+  <li>With timeago filter - 4 years and 9 months ago</li>
+</ul>]]></content><author><name></name></author><category term="misc" /><category term="misc" /><summary type="html"><![CDATA[puts "Hello Universe!" Stay tuned… 😃 Testing the timeago plugin on GitHub Pages Original date - 2020-04-13T10:20:00Z With timeago filter - 4 years and 9 months ago]]></summary></entry></feed>
