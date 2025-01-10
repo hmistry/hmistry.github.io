@@ -10,6 +10,7 @@ excerpt_separator: <!--more-->
 For one of my client projects, I explored different ways to increase upload speeds for large files uploaded from a desktop computer to AWS S3. The desktop computer was located in a different country, halfway around the world, with a throttled/restrictive outbound internet connection to the S3 storage located in the US region. One approach is doing parallel uploads but the focus was on how to get a faster connection.
 
 I discovered 3 ways to architect file uploads to AWS S3:
+<!--more-->
 
 1. Standard mode
 In this mode, you setup a bucket in S3 in a specified region with all the default settings and the client uploads the files to the S3 region directly no matter where the client is located in the world. This is the most simplest setup. The file upload speed will greatly depend on quality of the entire connection and ping times will depend on the distance to the storage.
