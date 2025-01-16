@@ -1,3 +1,7 @@
+# based on examples from:
+# - https://github.com/actions/starter-workflows/blob/main/pages/jekyll.yml
+# - https://www.moncefbelyamani.com/making-github-pages-work-with-latest-jekyll/ 
+
 name: Build and Deploy a Jekyll Site to GitHub Pages
 
 on:
@@ -5,11 +9,27 @@ on:
     branches:
       - main
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   jekyll:
     runs-on: macos-latest
     steps:
-      - name: 📂 setup
+      - name: 📂 Checkout
         uses: actions/checkout@v2
 
         # include the lines below if you are using jekyll-last-modified-at
@@ -17,17 +37,17 @@ jobs:
         # however this may be very slow for large repositories!
         # with:
         # fetch-depth: '0'
-      - name: 💎 setup ruby
+      - name: 💎 Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3
 
-      - name: 🔨 install dependencies & build site
+      - name: 🔨 Install dependencies & build site
         uses: limjh16/jekyll-action-ts@v2
         with:
           enable_cache: true
 
-      - name: 🚀 deploy
+      - name: 🚀 Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
