@@ -1,5 +1,5 @@
 # based on examples from:
-# - https://github.com/actions/starter-workflows/blob/main/pages/jekyll.yml
+# - https://github.com/actions/starter-workflows/blob/main/pages/jekyll-gh-pages.yml
 # - https://www.moncefbelyamani.com/making-github-pages-work-with-latest-jekyll/ 
 
 name: Build and Deploy a Jekyll Site to GitHub Pages
@@ -30,7 +30,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: 📂 Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
         # include the lines below if you are using jekyll-last-modified-at
         # or if you would otherwise need to fetch the full commit history
@@ -41,6 +41,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3
+          bundler-cache: true
 
       - name: 🔨 Install dependencies & build site
         uses: limjh16/jekyll-action-ts@v2
@@ -48,7 +49,7 @@ jobs:
           enable_cache: true
 
       - name: 🚀 Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
