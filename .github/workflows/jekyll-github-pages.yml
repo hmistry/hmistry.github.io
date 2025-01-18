@@ -27,10 +27,10 @@ concurrency:
 
 jobs:
   jekyll:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - name: 📂 Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
         # include the lines below if you are using jekyll-last-modified-at
         # or if you would otherwise need to fetch the full commit history
@@ -49,7 +49,7 @@ jobs:
           enable_cache: true
 
       - name: 🚀 Deploy
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
