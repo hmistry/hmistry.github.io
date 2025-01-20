@@ -43,13 +43,21 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
 
-      - name: 🔨 Install dependencies & build site
-        uses: limjh16/jekyll-action-ts@v2
-        with:
-          enable_cache: true
+      # - name: 🔨 Install dependencies & build site
+      #   uses: limjh16/jekyll-action-ts@v2
+      #   with:
+      #     enable_cache: true
+
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install
+    
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
 
       - name: 🚀 Deploy
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./_site
