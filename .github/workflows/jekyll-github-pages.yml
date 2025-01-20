@@ -43,3 +43,6 @@ jobs:
           # if the repo you are deploying to is <username>.github.io, uncomment the line below.
           # if you are including the line below, make sure your source files are NOT in the "main" branch:
           # publish_branch: gh-pages
+
+          # The above publish_branch didn't deploy from gh-pages branch to gh-pages env.
+          # To deploy, ensure the Repo Settings -> Pages -> Source is set to gh-pages branch. 

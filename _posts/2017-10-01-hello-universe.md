@@ -10,12 +10,8 @@ excerpt_separator: <!--more-->
 {% highlight ruby %}
   puts "Hello Universe!"
 {% endhighlight %}
+{% assign post_date = page.date %}
 
 Stay tuned... 😃
 
-Testing the timeago plugin on GitHub Pages
-
-{% assign date = '2020-04-13T10:20:00Z' %}
-
-- Original date - {{ date }}
-- With timeago filter - {{ date | timeago }}
+*Message posted {{ post_date | timeago }}*
