@@ -1,5 +1,408 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-01-09T07:42:44+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
-</subtitle><entry><title type="html">Using CDN to improve file uploads</title><link href="http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads.html" rel="alternate" type="text/html" title="Using CDN to improve file uploads" /><published>2020-09-29T00:00:00+00:00</published><updated>2020-09-29T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads</id><content type="html" xml:base="http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads.html"><![CDATA[<p>For one of my client projects, I explored different ways to increase upload speeds for large files uploaded from a desktop computer to AWS S3. The desktop computer was located in a different country, halfway around the world, with a throttled/restrictive outbound internet connection to the S3 storage located in the US region. One approach is doing parallel uploads but the focus was on how to get a faster connection.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-01-11T09:06:16+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
+</subtitle><entry><title type="html">Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home</title><link href="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html" rel="alternate" type="text/html" title="Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home" /><published>2026-01-08T00:00:00+00:00</published><updated>2026-01-08T00:00:00+00:00</updated><id>http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller</id><content type="html" xml:base="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"><![CDATA[<p>Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home.</p>
+
+<p>After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage.</p>
+
+<p>This post explains why most thermostat designs fall short and what worked better in practice.</p>
+
+<!--more-->
+
+<h2 id="problem-thermal-airflow-poor-sensing-and-no-dynamic-control">Problem: Thermal airflow, poor sensing, and no dynamic control</h2>
+
+<h4 id="scenario">Scenario</h4>
+
+<p><img src="/assets/images/HVAC-Home-Heat-Flow.png" alt="HVAC House Heat Flow Example" /></p>
+
+<p>Consider above example of a two-zone home:</p>
+
+<ul>
+  <li>One thermostat controls the downstairs (T1)</li>
+  <li>Another controls the upstairs (T2)</li>
+  <li>Zone dampers control hot/cold airflow between zones</li>
+  <li>A single HVAC unit serves both zones</li>
+  <li>One-sided solar heat gain</li>
+</ul>
+
+<p>Factors contributing to uneven heat distribution in this example are:</p>
+
+<ol>
+  <li>Open floor plan zones lose effectiveness as heated or cooled air quickly flows to the return vent, limiting heat transfer to the space.</li>
+  <li>One-sided solar heat gain creates uneven temperatures within a zone, making control decisions ambiguous.</li>
+  <li>Inter-zone thermal coupling causes heating in one zone to affect thermostats in another (i.e. heating downstairs affects T2 thermostat).</li>
+  <li>Poor thermostat placement results in measurements that do not reflect actual living spaces.</li>
+  <li>Room door and window states vary constantly, changing the room’s airflow and heat loss.</li>
+  <li>Vent adjustments are static and cannot adapt to weather, occupancy, or airflow changes.</li>
+  <li>Room-sensor averaging can mask cold rooms, delaying heating.</li>
+  <li>Lack of historical data makes it difficult to understand thermal behavior in the home and tune the HVAC system.</li>
+</ol>
+
+<h2 id="design-solution-control-where-comfort-is-actually-needed">Design Solution: Control Where Comfort is Actually Needed</h2>
+
+<p>The key insight was simple:</p>
+
+<ol>
+  <li>Control decisions should be based on room-level temperature data, not hallway averages. In practice, temperature does not equalize quickly enough to rely on averaging.</li>
+  <li>The control strategy must be customizable and allow algorithms beyond simple averaging.</li>
+</ol>
+
+<h4 id="architecture">Architecture</h4>
+
+<p><img src="/assets/images/HVAC-Architecture-Proposed.png" alt="HVAC Design Solution" /></p>
+
+<p>The solution consists of:</p>
+
+<ul>
+  <li>Low-cost Bluetooth temperature sensors placed in each room</li>
+  <li>Home Assistant running on a Raspberry Pi 5 handles all the control logic</li>
+  <li>An ESP32-based HVAC zone controller managing dampers, HVAC furnace, and A/C Condenser</li>
+  <li>Custom algorithms to optimize heating and cooling for comfort</li>
+</ul>
+
+<p>How it works:</p>
+
+<ul>
+  <li>Bluetooth Temperature sensors can be placed in ideal locations in each room, sending temperature and humidity data to Home Assistant</li>
+  <li>The ESP32 HVAC Zone Controller is connected to zone dampers, HVAC furnace, and A/C Condenser.</li>
+  <li>HVAC Zone Controller is setup to run the following:
+    <ul>
+      <li>Cycles: Off, Heat, Cool, Fan, Purge</li>
+      <li>Zones: All, Upstairs, Downstairs</li>
+      <li>Safe operations: ensure correct sequencing and timing requirements between cycles and zones are met</li>
+    </ul>
+  </li>
+  <li>Created a HVAC Dashboard in Home Assistant with all the necessary thermostat controls and data per zone.</li>
+  <li>Use automations to ensure selected room temperatures in a zone stay within a range, e.g. 70-73°F during the winter (heat only) and 80-83°F in the summer (cool only). Instead of averaging room temperatures, the automation evaluates the minimum and maximum room temperatures in a zone and calls for heating or cooling when any prioritized room moves below or above the defined range respectively*.</li>
+</ul>
+
+<p><em>*There are some edge cases that require additional logic to the algorithm. However, for the purposes of this article, this is the core strategy.</em></p>
+
+<h4 id="hardware">Hardware</h4>
+
+<p><img src="/assets/images/Xiaomi-RPi-ESP.jpg" alt="Xiaomi Sensors + Raspberry Pi + ESP32 Controller" /></p>
+
+<h4 id="home-assistant-thermostat-ui">Home Assistant Thermostat UI</h4>
+
+<p><img src="/assets/images/HA-Thermostats.png" alt="HA Thermostats" /></p>
+
+<h2 id="results">Results</h2>
+
+<h4 id="room-temperature-charts">Room Temperature Charts</h4>
+
+<p><img src="/assets/images/HA-Charts-Temp.png" alt="HA HVAC Temperature Charts" /></p>
+
+<h4 id="hvac-runtime-charts">HVAC Runtime Charts</h4>
+
+<p><img src="/assets/images/HA-Usage-Charts.png" alt="HA HVAC Usage Charts" /></p>
+
+<p>I implemented the above solution with 9 Temperature sensors including 1 outside and it’s been running for 10 months now. Here’s the results so far:</p>
+
+<ol>
+  <li>Much Better Comfort
+    <ul>
+      <li>Prioritized room temperature variations dropped from several degrees to roughly 3°F during regulated periods. Cold and hot bedrooms largely disappeared.</li>
+      <li>Sometimes large temperature differences between rooms from solar heat gain occur that require some user intervention (i.e. close/open room doors &amp; windows) to help close the gap quicker and allow the system to operate normally for rest of the night.</li>
+    </ul>
+  </li>
+  <li>Inter-Zone Coupling Eliminated
+    <ul>
+      <li>Heating downstairs no longer interferes with upstairs heating. Bedroom temperatures now drive decisions instead of hallway temperature.</li>
+    </ul>
+  </li>
+  <li>Data-Driven HVAC Tuning
+    <ul>
+      <li>Temperature data helped identify airflow imbalances and adjusted vents accordingly</li>
+      <li>Runtime data helped optimize energy consumption by heating one zone at a time</li>
+    </ul>
+  </li>
+  <li>Stable HVAC Operation
+    <ul>
+      <li>No short cycling of HVAC furnace or A/C condenser</li>
+      <li>Purge cycles happen after each run</li>
+      <li>Correct sequencing, timing, and safeguards enforced</li>
+    </ul>
+  </li>
+  <li>Modest Energy Impact
+    <ul>
+      <li>Energy usage increased by approximately 10–20%, but comfort improved significantly. For the first time, the home maintained consistent, comfortable temperatures throughout the day.</li>
+    </ul>
+  </li>
+  <li>Cheaper than commercial solutions
+    <ul>
+      <li>9 Temperature sensors ($36) + Raspberry Pi 5 ($140) + ESP32 x8 Relay Board ($44) = $220</li>
+      <li>Compared to an Ecobee (2x$120) + 6 Room sensors ($240) + Zone Controller ($150) = $630</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Many of the comfort issues I had lived with for years—hot and cold rooms, overheated hallways, and slow recovery from afternoon solar heat gain—turned out to be artifacts of poor sensing and overly simple control logic. I was surprised by how effective room-level sensing and a window-based control strategy turned out to be, and the experience has changed how I think about residential HVAC systems. The biggest gains did not come from adding AI, machine learning, or fancy hardware, but from giving the system better inputs and using the right control logic to respond to real conditions instead of averaged data.</p>
+
+<p>This solution is not a silver bullet. It still requires occasional user intervention when there are large temperature differences between rooms, as well as some technical knowledge to build and maintain. But after ten months of use, it has delivered a level of comfort that commercial thermostats never achieved in my home, and it reinforces a simple idea: comfort improves when control decisions are made closer to where people actually live.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li>For in-depth details on implementation and results, see <a href="https://github.com/hmistry/smart-thermostat-controller/blob/main/smart_thermostat_controller_design.md">Smart Thermostat Controller Design and Results</a></li>
+  <li>Other information available in <a href="https://github.com/hmistry/smart-thermostat-controller">Smart Thermostat Controller Github repository</a></li>
+</ul>]]></content><author><name></name></author><category term="home-diy" /><category term="home-assistant" /><category term="smart-thermostat" /><category term="hvac" /><category term="raspberry-pi" /><summary type="html"><![CDATA[Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice.]]></summary></entry><entry><title type="html">Home Assistant: Lessons Learned</title><link href="http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons.html" rel="alternate" type="text/html" title="Home Assistant: Lessons Learned" /><published>2025-12-15T00:00:00+00:00</published><updated>2025-12-15T00:00:00+00:00</updated><id>http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons</id><content type="html" xml:base="http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons.html"><![CDATA[<p>My first 3 months of using Home Assistant (HA) on a Raspberry Pi 5 were unreliable: frequent database corruption, failed boots and data loss. After researching and addressing the root causes, Home Assistant has now been stable and running smoothly for 6+ months.</p>
+
+<p>Below are my experience-based tips that may help you build a stable Home Assistant platform.</p>
+
+<!--more-->
+
+<ol>
+  <li>
+    <p>SD Card → SSD (Most Important Fix)</p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>SD cards failed repeatedly once backups exceeded ~100 MB</li>
+          <li>Resulted in database file corruption and failed boots</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Avoid SD cards entirely for long-term HA installs</li>
+          <li>Use a NVMe SSD for main disk</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>SQLite → MariaDB (Second Most Important Fix)</p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>SQLite database corruption occurred frequently</li>
+          <li>Unsure whether root cause was SD card I/O, SQLite itself, or bad (entity) data</li>
+          <li>Lost historical data multiple times and had to start fresh</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Switch recorder to MariaDB (HA add-on)</li>
+          <li>Much more stable, even with large backup sizes and data migrations during updates</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Backups (Off-Device) (Third Most Important Thing)</p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>On-device backups don’t help when storage fails or file corruption occurs</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Back up frequently</li>
+          <li>Download backups off the HA disk periodically</li>
+          <li>Download and store backup encryption key off-device, see <code class="language-plaintext highlighter-rouge">Settings → System → Backup → Configure Backup Settings → Download Emergency Kit</code></li>
+          <li>Worst-case you minimize data loss to your most recent backup or easily restore all the devices, integrations, and configurations for a fresh start</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>“Disable → Change → Enable” Strategy For Modifying Entities</p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>Modifying or deleting entities while active sometimes preceded DB issues</li>
+          <li>Using uninitialized entities in templates caused unpredictable behavior</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Disable entities before modifying or deleting</li>
+          <li>Re-enable after changes made and allow time for update events if applicable</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Be Patient With Boot / Shutdown</p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>HA appears “hung” during boot or shutdown</li>
+          <li>Power-cycling too early made things worse by increasing file corruption risk</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Wait several minutes for Raspberry Pi to shutdown processes or boot up</li>
+          <li>Raspberry Pi is not a high-performance computer</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>HA Upgrades Can Fail On Reboot</p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>Failed boots after HA upgrades</li>
+          <li>Components with custom logic can fail on reboot after due to missing or uninitialized states</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Backup before every upgrade (download to off-device)</li>
+          <li>Harden custom logic/formulas against uninitialized, unknown, unavailable, none, or null states (see this <a href="https://community.home-assistant.io/t/how-to-handle-unknown-or-unavailable-states-in-template-entities-or-automations/411632/15">post on states</a>)</li>
+          <li>Use the Template Editor under <code class="language-plaintext highlighter-rouge">Developer Tools → Template</code> to test your formulas or state values</li>
+          <li>Check <code class="language-plaintext highlighter-rouge">Developer Tools → Statistics</code> and fix any issues</li>
+          <li>Check logs for any critical errors before and after upgrading under <code class="language-plaintext highlighter-rouge">Settings → System → Logs</code> and select the services/add-ons in the dropdown button</li>
+          <li>Use “Disable → change → enable” strategy when modifying entities</li>
+          <li>Sometimes starting fresh (without importing bad historical data) is necessary</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Always Validate Changes to <code class="language-plaintext highlighter-rouge">configuration.yaml</code></p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>Invalid YAML configuration can prevent HA from booting</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Run “Check Configuration” under <code class="language-plaintext highlighter-rouge">Developer Tools → YAML → Check Configuration</code> after making changes and before restarting HA</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Clear Cache to Fix Broken Dashboards</p>
+
+    <ul>
+      <li>Problem:
+        <ul>
+          <li>Energy, Logs, or History pages fail to load but other dashboard works</li>
+        </ul>
+      </li>
+      <li>Fix:
+        <ul>
+          <li>Test dashboard in a private browser window</li>
+          <li>If it works, clear caches</li>
+          <li>Desktop browser: hard reload / clear cache</li>
+          <li>iOS app: <code class="language-plaintext highlighter-rouge">Settings → Debug → Reset Frontend Cache</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Pairing Bluetooth Keyboard / Mouse via CLI to RPi</p>
+
+    <ul>
+      <li>Reference: <a href="https://www.youtube.com/watch?v=UEmSsscijKE">Pairing Bluetooth Devices</a></li>
+      <li>
+        <p>Shell Commands used:</p>
+
+        <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On your computer terminal</span>
+ssh pi@raspberrypi.local
+
+<span class="c"># On the Raspberry Pi</span>
+<span class="nb">sudo </span>bluetoothctl
+agent on
+default agent
+scan on
+<span class="c"># Wait for device address</span>
+scan off
+devices <span class="c"># To print list of devices found and their addresses</span>
+<span class="c"># Replace AA:BB:CC:DD:EE:FF with your device address below</span>
+pair AA:BB:CC:DD:EE:FF
+connect AA:BB:CC:DD:EE:FF
+trust AA:BB:CC:DD:EE:FF <span class="c"># Allows RPi to trust device and reconnect on reboot</span>
+</code></pre></div>        </div>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>NVMe SSD Installation</p>
+
+    <ul>
+      <li>References:
+        <ul>
+          <li><a href="https://warmestrobot.com/blog/2024/06/27/raspberry-pi-network-boot-guide-2/">Raspberry Pi Boot Guide</a></li>
+          <li><a href="https://www.martinrowan.co.uk/2024/02/installing-home-assistant-on-raspberry-pi-5-nvme-storage/">HA install on Raspberry Pi 5 with NVMe SSD</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Recover Files From a Failed HAOS Boot and No Off-Device Backup</p>
+
+    <ul>
+      <li>Notes
+        <ul>
+          <li>Credits to HA community forum contributors for the solution (sorry, I lost the link to where I found it)</li>
+          <li>You can recover all the config files or on-device backups if you have the encryption key to unlock it on restore</li>
+          <li><a href="https://community.home-assistant.io/t/home-assistant-addon-filebrowser/282108">FileBrowser add-on</a>: GUI File browser</li>
+          <li><a href="https://github.com/hassio-addons/addon-ssh">Advanced SSH &amp; Terminal add-on</a>: SSH Terminal</li>
+        </ul>
+      </li>
+      <li>Steps:
+        <ol>
+          <li>Original HA SD card fails to boot - put aside</li>
+          <li>Use a new SD card and install a fresh copy of Home Assistant on it</li>
+          <li>Put the new SD card in Raspberry Pi and setup new HA instance (no restoring backups)</li>
+          <li>Install Advanced SSH/Terminal and FileBrowser add-ons</li>
+          <li>Config SSH/Terminal and disable protection mode</li>
+          <li>Insert failed SD card via USB port on Raspberry Pi</li>
+          <li>Wait for notification in Settings saying multiple HAOS detected… make note of the USB path eg /dev/sda8 but do not fix</li>
+          <li>
+            <p>In HA SSH Terminal, do the following:</p>
+
+            <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># login to correct container shell to access usb</span>
+<span class="nb">sudo </span>docker <span class="nb">exec</span> <span class="nt">-it</span> homeassistant /bin/bash
+<span class="nb">mkdir</span> /config/tmp <span class="c"># create a tmp folder</span>
+mount /dev/sda8 /config/tmp <span class="c"># mount SD card usb to tmp folder</span>
+<span class="c"># =&gt; now you can browse files on bad SD card in FileBrowser under the mounted folder /config/tmp</span>
+
+<span class="c"># To copy files over to new SD card HAOS:</span>
+<span class="nb">cd</span> /config
+<span class="nb">mkdir </span>old_data
+<span class="nb">cp</span> <span class="nt">-r</span> /config/tmp/supervisor old_data/
+<span class="c"># =&gt; now all the files from the bad SD card are in the new HAOS /config/old_data</span>
+
+<span class="c"># unmount USB</span>
+umount /config/tmp
+<span class="nb">exit</span> <span class="c"># exits the docker bash shell and brings you back to your terminal shell</span>
+</code></pre></div>            </div>
+          </li>
+          <li>Use FileBrowser to download /config/old_data</li>
+          <li>Re-enable SSH/Terminal protection mode</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="summary">Summary</h2>
+
+<p>What ultimately stabilized my Home Assistant setup:</p>
+
+<ul>
+  <li>SSD instead of SD card</li>
+  <li>MariaDB instead of SQLite</li>
+  <li>Defensive entity handling strategy</li>
+  <li>Hardened custom logic/formula use in components</li>
+  <li>Taking precautions when upgrading and having backup copies</li>
+</ul>
+
+<p>Now Home Assistant behaves like a reliable system!</p>]]></content><author><name></name></author><category term="home-diy" /><category term="home-assistant" /><category term="raspberry-pi" /><summary type="html"><![CDATA[My first 3 months of using Home Assistant (HA) on a Raspberry Pi 5 were unreliable: frequent database corruption, failed boots and data loss. After researching and addressing the root causes, Home Assistant has now been stable and running smoothly for 6+ months. Below are my experience-based tips that may help you build a stable Home Assistant platform.]]></summary></entry><entry><title type="html">Using CDN to improve file uploads</title><link href="http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads.html" rel="alternate" type="text/html" title="Using CDN to improve file uploads" /><published>2020-09-29T00:00:00+00:00</published><updated>2020-09-29T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads</id><content type="html" xml:base="http://hmistry.github.io/software/2020/09/29/using-cdn-to-improve-uploads.html"><![CDATA[<p>For one of my client projects, I explored different ways to increase upload speeds for large files uploaded from a desktop computer to AWS S3. The desktop computer was located in a different country, halfway around the world, with a throttled/restrictive outbound internet connection to the S3 storage located in the US region. One approach is doing parallel uploads but the focus was on how to get a faster connection.</p>
 
 <p>I discovered 3 ways to architect file uploads to AWS S3:
 <!--more--></p>
