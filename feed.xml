@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-01-11T09:06:16+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-01-12T06:32:42+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
 </subtitle><entry><title type="html">Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home</title><link href="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html" rel="alternate" type="text/html" title="Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home" /><published>2026-01-08T00:00:00+00:00</published><updated>2026-01-08T00:00:00+00:00</updated><id>http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller</id><content type="html" xml:base="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"><![CDATA[<p>Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home.</p>
 
-<p>After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage.</p>
+<p>After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes with a budget-friendly cost structure. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage.</p>
 
 <p>This post explains why most thermostat designs fall short and what worked better in practice.</p>
 
@@ -41,8 +41,8 @@
 <p>The key insight was simple:</p>
 
 <ol>
-  <li>Control decisions should be based on room-level temperature data, not hallway averages. In practice, temperature does not equalize quickly enough to rely on averaging.</li>
-  <li>The control strategy must be customizable and allow algorithms beyond simple averaging.</li>
+  <li>Thermostat control decisions should be based on room-level temperature data, not hallway averages. In practice, temperature does not equalize quickly enough to rely on averaging.</li>
+  <li>The thermostat control strategy must be customizable and allow algorithms beyond simple averaging.</li>
 </ol>
 
 <h4 id="architecture">Architecture</h4>
@@ -130,13 +130,14 @@
     <ul>
       <li>9 Temperature sensors ($36) + Raspberry Pi 5 ($140) + ESP32 x8 Relay Board ($44) = $220</li>
       <li>Compared to an Ecobee (2x$120) + 6 Room sensors ($240) + Zone Controller ($150) = $630</li>
+      <li>Adding temperature sensors is cheap at $4 each</li>
     </ul>
   </li>
 </ol>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Many of the comfort issues I had lived with for years—hot and cold rooms, overheated hallways, and slow recovery from afternoon solar heat gain—turned out to be artifacts of poor sensing and overly simple control logic. I was surprised by how effective room-level sensing and a window-based control strategy turned out to be, and the experience has changed how I think about residential HVAC systems. The biggest gains did not come from adding AI, machine learning, or fancy hardware, but from giving the system better inputs and using the right control logic to respond to real conditions instead of averaged data.</p>
+<p>Many of the comfort issues I had lived with for years—hot and cold rooms, overheated hallways, and slow recovery from afternoon solar heat gain—turned out to be artifacts of poor sensing and overly simple control logic. I was surprised by how effective room-level sensing and a window-based control strategy turned out to be, and the experience has changed how I think about residential HVAC systems. The biggest gains did not come from adding AI, machine learning, or fancy hardware, but from giving the system better inputs and using the right control logic to respond to real conditions instead of averaged data. The secondary benefit is a better cost structure by unifying the controller and for scaling sensing in a home.</p>
 
 <p>This solution is not a silver bullet. It still requires occasional user intervention when there are large temperature differences between rooms, as well as some technical knowledge to build and maintain. But after ten months of use, it has delivered a level of comfort that commercial thermostats never achieved in my home, and it reinforces a simple idea: comfort improves when control decisions are made closer to where people actually live.</p>
 
@@ -144,8 +145,8 @@
 
 <ul>
   <li>For in-depth details on implementation and results, see <a href="https://github.com/hmistry/smart-thermostat-controller/blob/main/smart_thermostat_controller_design.md">Smart Thermostat Controller Design and Results</a></li>
-  <li>Other information available in <a href="https://github.com/hmistry/smart-thermostat-controller">Smart Thermostat Controller Github repository</a></li>
-</ul>]]></content><author><name></name></author><category term="home-diy" /><category term="home-assistant" /><category term="smart-thermostat" /><category term="hvac" /><category term="raspberry-pi" /><summary type="html"><![CDATA[Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice.]]></summary></entry><entry><title type="html">Home Assistant: Lessons Learned</title><link href="http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons.html" rel="alternate" type="text/html" title="Home Assistant: Lessons Learned" /><published>2025-12-15T00:00:00+00:00</published><updated>2025-12-15T00:00:00+00:00</updated><id>http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons</id><content type="html" xml:base="http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons.html"><![CDATA[<p>My first 3 months of using Home Assistant (HA) on a Raspberry Pi 5 were unreliable: frequent database corruption, failed boots and data loss. After researching and addressing the root causes, Home Assistant has now been stable and running smoothly for 6+ months.</p>
+  <li>Other project information is available in <a href="https://github.com/hmistry/smart-thermostat-controller">Smart Thermostat Controller Github repository</a></li>
+</ul>]]></content><author><name></name></author><category term="home-diy" /><category term="home-assistant" /><category term="smart-thermostat" /><category term="hvac" /><category term="raspberry-pi" /><summary type="html"><![CDATA[Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes with a budget-friendly cost structure. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice.]]></summary></entry><entry><title type="html">Home Assistant: Lessons Learned</title><link href="http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons.html" rel="alternate" type="text/html" title="Home Assistant: Lessons Learned" /><published>2025-12-15T00:00:00+00:00</published><updated>2025-12-15T00:00:00+00:00</updated><id>http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons</id><content type="html" xml:base="http://hmistry.github.io/home-diy/2025/12/15/home-assistant-lessons.html"><![CDATA[<p>My first 3 months of using Home Assistant (HA) on a Raspberry Pi 5 were unreliable: frequent database corruption, failed boots and data loss. After researching and addressing the root causes, Home Assistant has now been stable and running smoothly for 6+ months.</p>
 
 <p>Below are my experience-based tips that may help you build a stable Home Assistant platform.</p>
 

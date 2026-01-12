@@ -7,8 +7,8 @@
 <meta name="generator" content="Jekyll v4.4.1" />
 <meta property="og:title" content="Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice." />
-<meta property="og:description" content="Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice." />
+<meta name="description" content="Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes with a budget-friendly cost structure. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice." />
+<meta property="og:description" content="Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes with a budget-friendly cost structure. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice." />
 <link rel="canonical" href="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html" />
 <meta property="og:url" content="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html" />
 <meta property="og:site_name" content="Hiren Mistry" />
@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2026-01-08T00:00:00+00:00","datePublished":"2026-01-08T00:00:00+00:00","description":"Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice.","headline":"Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home","mainEntityOfPage":{"@type":"WebPage","@id":"http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"},"url":"http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2026-01-08T00:00:00+00:00","datePublished":"2026-01-08T00:00:00+00:00","description":"Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home. After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes with a budget-friendly cost structure. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage. This post explains why most thermostat designs fall short and what worked better in practice.","headline":"Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home","mainEntityOfPage":{"@type":"WebPage","@id":"http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"},"url":"http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hmistry.github.io/feed.xml" title="Hiren Mistry" /><script>
 if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNotTrack === "yes" || navigator.msDoNotTrack === "1")) {
@@ -122,7 +122,7 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
   <div class="post-content e-content" itemprop="articleBody">
     <p>Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home.</p>
 
-<p>After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage.</p>
+<p>After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes with a budget-friendly cost structure. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage.</p>
 
 <p>This post explains why most thermostat designs fall short and what worked better in practice.</p>
 
@@ -162,8 +162,8 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
 <p>The key insight was simple:</p>
 
 <ol>
-  <li>Control decisions should be based on room-level temperature data, not hallway averages. In practice, temperature does not equalize quickly enough to rely on averaging.</li>
-  <li>The control strategy must be customizable and allow algorithms beyond simple averaging.</li>
+  <li>Thermostat control decisions should be based on room-level temperature data, not hallway averages. In practice, temperature does not equalize quickly enough to rely on averaging.</li>
+  <li>The thermostat control strategy must be customizable and allow algorithms beyond simple averaging.</li>
 </ol>
 
 <h4 id="architecture">Architecture</h4>
@@ -251,13 +251,14 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
     <ul>
       <li>9 Temperature sensors ($36) + Raspberry Pi 5 ($140) + ESP32 x8 Relay Board ($44) = $220</li>
       <li>Compared to an Ecobee (2x$120) + 6 Room sensors ($240) + Zone Controller ($150) = $630</li>
+      <li>Adding temperature sensors is cheap at $4 each</li>
     </ul>
   </li>
 </ol>
 
 <h2 id="conclusion">Conclusion</h2>
 
-<p>Many of the comfort issues I had lived with for years—hot and cold rooms, overheated hallways, and slow recovery from afternoon solar heat gain—turned out to be artifacts of poor sensing and overly simple control logic. I was surprised by how effective room-level sensing and a window-based control strategy turned out to be, and the experience has changed how I think about residential HVAC systems. The biggest gains did not come from adding AI, machine learning, or fancy hardware, but from giving the system better inputs and using the right control logic to respond to real conditions instead of averaged data.</p>
+<p>Many of the comfort issues I had lived with for years—hot and cold rooms, overheated hallways, and slow recovery from afternoon solar heat gain—turned out to be artifacts of poor sensing and overly simple control logic. I was surprised by how effective room-level sensing and a window-based control strategy turned out to be, and the experience has changed how I think about residential HVAC systems. The biggest gains did not come from adding AI, machine learning, or fancy hardware, but from giving the system better inputs and using the right control logic to respond to real conditions instead of averaged data. The secondary benefit is a better cost structure by unifying the controller and for scaling sensing in a home.</p>
 
 <p>This solution is not a silver bullet. It still requires occasional user intervention when there are large temperature differences between rooms, as well as some technical knowledge to build and maintain. But after ten months of use, it has delivered a level of comfort that commercial thermostats never achieved in my home, and it reinforces a simple idea: comfort improves when control decisions are made closer to where people actually live.</p>
 
@@ -265,7 +266,7 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
 
 <ul>
   <li>For in-depth details on implementation and results, see <a href="https://github.com/hmistry/smart-thermostat-controller/blob/main/smart_thermostat_controller_design.md">Smart Thermostat Controller Design and Results</a></li>
-  <li>Other information available in <a href="https://github.com/hmistry/smart-thermostat-controller">Smart Thermostat Controller Github repository</a></li>
+  <li>Other project information is available in <a href="https://github.com/hmistry/smart-thermostat-controller">Smart Thermostat Controller Github repository</a></li>
 </ul>
 
 
@@ -276,7 +277,7 @@ if(!(window.doNotTrack === "1" || navigator.doNotTrack === "1" || navigator.doNo
     </main><footer class="site-footer">
   <div class="wrapper">
     <small>
-      &copy; <time datetime="2026-01-11T09:06:16+00:00">2026</time>. All rights reserved.
+      &copy; <time datetime="2026-01-12T06:32:42+00:00">2026</time>. All rights reserved.
     </small>
   </div>
 </footer>
