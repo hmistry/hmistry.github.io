@@ -7,7 +7,7 @@ ruby RUBY_VERSION
 # require 'open-uri'
 # versions = JSON.parse(::URI.open('https://pages.github.com/versions.json').read)
 
-gem "jekyll", "~> 4.3"
+gem "jekyll", "~> 4.4"
 
 # If you want to use GitHub Pages, remove the "gem "jekyll"" above and
 # uncomment the line below. To upgrade, run `bundle update github-pages`.
