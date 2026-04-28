@@ -1,5 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-01-13T07:12:45+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
-</subtitle><entry><title type="html">Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home</title><link href="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html" rel="alternate" type="text/html" title="Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home" /><published>2026-01-08T00:00:00+00:00</published><updated>2026-01-08T00:00:00+00:00</updated><id>http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller</id><content type="html" xml:base="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"><![CDATA[<p>Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-04-28T06:15:40+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
+</subtitle><entry><title type="html">Markdown Viewer</title><link href="http://hmistry.github.io/software/2026/04/27/markdown-viewer.html" rel="alternate" type="text/html" title="Markdown Viewer" /><published>2026-04-27T00:00:00+00:00</published><updated>2026-04-27T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2026/04/27/markdown-viewer</id><content type="html" xml:base="http://hmistry.github.io/software/2026/04/27/markdown-viewer.html"><![CDATA[<h2 id="problem">Problem</h2>
+
+<p>When working with Markdown files, I encounter the following challenges:</p>
+
+<ol>
+  <li>rendering it in a similar or better style than Github’s Markdown style</li>
+  <li>printing it with a normal font size and spacings (can be PDF or paper)</li>
+</ol>
+
+<h2 id="solution">Solution</h2>
+
+<p>I vibe coded with Claude AI a self-contained, local HTML file that will render a Markdown file with Github styling and better print formatting. I extended the viewer to render code files with syntax highlighting and print in color.</p>
+
+<!--more-->
+
+<h2 id="features">Features</h2>
+
+<ul>
+  <li>GitHub-style rendering</li>
+  <li>Sidebar table of contents — auto-generated from headings, indented by level (h1/h2/h3)</li>
+  <li>Collapsible header sections</li>
+  <li>Light / dark mode themes</li>
+  <li>Code file support — view source code files with syntax highlighting applied</li>
+  <li>Print-ready — optimized font sizes and margins, color highlighted code</li>
+</ul>
+
+<p>Download <code class="language-plaintext highlighter-rouge">markdown-viewer.html</code> from <a href="(https://github.com/hmistry/markdown-viewer)">Markdown Viewer Repo</a>, open it in any browser, drop in a <code class="language-plaintext highlighter-rouge">.md</code> or code file.</p>
+
+<h2 id="screenshots">Screenshots</h2>
+
+<p><img src="/assets/images/md-viewer-sm.png" alt="Markdown in light mode and code in dark mode" /></p>]]></content><author><name></name></author><category term="software" /><category term="html" /><category term="app" /><summary type="html"><![CDATA[Problem When working with Markdown files, I encounter the following challenges: rendering it in a similar or better style than Github’s Markdown style printing it with a normal font size and spacings (can be PDF or paper) Solution I vibe coded with Claude AI a self-contained, local HTML file that will render a Markdown file with Github styling and better print formatting. I extended the viewer to render code files with syntax highlighting and print in color.]]></summary></entry><entry><title type="html">Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home</title><link href="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html" rel="alternate" type="text/html" title="Why Smart Thermostats Still Struggle — and How Room-Level Sensing Finally Fixed My Home" /><published>2026-01-08T00:00:00+00:00</published><updated>2026-01-08T00:00:00+00:00</updated><id>http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller</id><content type="html" xml:base="http://hmistry.github.io/home-diy/2026/01/08/smart-thermostat-controller.html"><![CDATA[<p>Most residential forced-air HVAC systems struggle with uneven heating and cooling — not because of bad equipment, but because they lack the sensing and control needed to adapt to real-world conditions inside a home.</p>
 
 <p>After years of dealing with hot and cold rooms in a home with two-zone forced-air HVAC system, I built a custom room-sensing thermostat controller to address the root causes with a budget-friendly cost structure. After ten months of daily use, the home has been noticeably more comfortable, with only a modest increase in energy usage.</p>
 
@@ -871,4 +901,4 @@ SQLite3 Results shown in next <a href="#typecasting">section #5</a>.</p>
 
 <p>Stay tuned… 😃</p>
 
-<p><em>Message posted 8 years and 3 months ago</em></p>]]></content><author><name></name></author><category term="misc" /><category term="misc" /><summary type="html"><![CDATA[puts "Hello Universe!" Stay tuned… 😃 Message posted 8 years and 3 months ago]]></summary></entry></feed>
+<p><em>Message posted 8 years and 7 months ago</em></p>]]></content><author><name></name></author><category term="misc" /><category term="misc" /><summary type="html"><![CDATA[puts "Hello Universe!" Stay tuned… 😃 Message posted 8 years and 7 months ago]]></summary></entry></feed>
