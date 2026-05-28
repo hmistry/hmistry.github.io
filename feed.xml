@@ -1,5 +1,199 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-04-28T06:15:40+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
-</subtitle><entry><title type="html">Markdown Viewer</title><link href="http://hmistry.github.io/software/2026/04/27/markdown-viewer.html" rel="alternate" type="text/html" title="Markdown Viewer" /><published>2026-04-27T00:00:00+00:00</published><updated>2026-04-27T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2026/04/27/markdown-viewer</id><content type="html" xml:base="http://hmistry.github.io/software/2026/04/27/markdown-viewer.html"><![CDATA[<h2 id="problem">Problem</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="http://hmistry.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hmistry.github.io/" rel="alternate" type="text/html" /><updated>2026-05-28T20:41:58+00:00</updated><id>http://hmistry.github.io/feed.xml</id><title type="html">Hiren Mistry</title><subtitle>This is my personal blog where I write about my projects.
+</subtitle><entry><title type="html">Zero Inbox Email Strategy</title><link href="http://hmistry.github.io/productivity/2026/05/28/zero-inbox-email-strategy.html" rel="alternate" type="text/html" title="Zero Inbox Email Strategy" /><published>2026-05-28T00:00:00+00:00</published><updated>2026-05-28T00:00:00+00:00</updated><id>http://hmistry.github.io/productivity/2026/05/28/zero-inbox-email-strategy</id><content type="html" xml:base="http://hmistry.github.io/productivity/2026/05/28/zero-inbox-email-strategy.html"><![CDATA[<h1 id="my-near-zero-inbox-system">My Near-Zero Inbox System</h1>
+
+<p>I’ve tried several “zero inbox” strategies over the years but none of them have stuck. Most systems I tried had similar failures: they moved the mess somewhere else instead of helping to manage it, grew a backlog over time, and required high effort to stay functional.</p>
+
+<p>I’ve come up with a new strategy after brainstorming with ChatGPT - built around workflow, visibility, and automation - that finally stuck. The approach improves the signal-to-noise ratio by chunking emails by importance while Gmail filters handle the sorting automatically. (I use “label” and “folder” interchangeably to refer to Gmail’s label-based organizational system.) This system is built for Gmail, though the principles can apply to other compatible email services.</p>
+
+<!--more-->
+
+<h2 id="core-idea">Core Idea</h2>
+
+<p>The core idea came from understanding my email pain points and why the previous systems didn’t work. The issues stemmed from not having a way to separate emails by urgency and importance — emails I needed to act on, was waiting on, could read later, or didn’t care about — plus a better archive structure that keeps high-value emails separate from the noise.</p>
+
+<p>The new core idea to solve these issues is:</p>
+
+<ul>
+  <li>inbox is for triage only</li>
+  <li>use workflow labels to separate emails by importance:
+    <ul>
+      <li>needs attention/action</li>
+      <li>waiting for someone or event</li>
+      <li>low priority/informational</li>
+    </ul>
+  </li>
+  <li>a new set of archive labels to organize emails in a hierarchical structure with categories and subcategories</li>
+  <li>use automation for labeling, moving, archiving, and deleting; applied to frequent emails</li>
+</ul>
+
+<p>The biggest impact comes from the tailored workflow and automation — but it all starts with the label system, which is what makes everything else possible.</p>
+
+<h2 id="my-label-system">My Label System</h2>
+
+<p>To implement this, I used 3 types of labels: workflow, archive, and special case. The labels are prefixed with numbers to control the order of display in the Gmail sidebar - workflow labels are first as they are most used, then archive labels in order of personal importance, and last special case labels to handle edge cases.</p>
+
+<h3 id="workflow-labels">Workflow Labels</h3>
+
+<p>The following labels are used to facilitate the workflow:</p>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">Inbox</code> - contains new emails for triage</li>
+  <li><code class="language-plaintext highlighter-rouge">0-Action</code> - for important emails that need attention or require an action within 2-3 days e.g. reply to someone or make a payment for a bill.</li>
+  <li><code class="language-plaintext highlighter-rouge">0-Waiting</code> - for emails that I’m waiting for a response or an event e.g. an auto-payment for utility or quote from a contractor</li>
+  <li><code class="language-plaintext highlighter-rouge">0-ThisWeek</code> - non-urgent or informational emails that can be processed within a week e.g. weekly stock market newsletter or reply to friend’s party invite.</li>
+</ol>
+
+<h3 id="archive-labels">Archive Labels</h3>
+
+<p>I used 2 levels for archive labels: category and subcategory, to help group labels as there were many:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">1-Finance</code>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Banking</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Bills</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Tax</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Insurance</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Receipts</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">2-Personal</code>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Travel</code></li>
+      <li><code class="language-plaintext highlighter-rouge">House</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Auto</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Other</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">3-Health</code>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Med</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Dental</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Vision</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">4-Subscriptions</code>
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">Finance</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Education</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Entertainment</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Health</code></li>
+      <li><code class="language-plaintext highlighter-rouge">Promos</code></li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">5-Other</code></li>
+</ul>
+
+<p>My thoughts on organizing the emails this way are:</p>
+
+<ol>
+  <li>I simplified the different types of personal emails into 5 large buckets: <code class="language-plaintext highlighter-rouge">Finance</code>, <code class="language-plaintext highlighter-rouge">Personal</code>, <code class="language-plaintext highlighter-rouge">Health</code>, <code class="language-plaintext highlighter-rouge">Subscriptions</code>, and a catch-all <code class="language-plaintext highlighter-rouge">Other</code>. The category name <code class="language-plaintext highlighter-rouge">Subscriptions</code> sounds like it’s for subscription services like Netflix but it is actually for low value informational emails like privacy notices, newsletters, sales, etc. I wasn’t able to come up with a better category name so I kept it.</li>
+  <li>Categories 1-3 are for high value emails like bank statements, bills, payment confirmation, personal correspondence emails, doctor emails, etc.</li>
+  <li>Low value informational emails like bank privacy notices, newsletters, sales, etc go into Category 4 to keep the “noise” out of high value email folders. Normal organizational conventions will group all emails from banks into a <code class="language-plaintext highlighter-rouge">banking</code> or <code class="language-plaintext highlighter-rouge">finance</code> folder but I found when browsing such folder over time, the important emails get buried with the informational emails and nowadays, there’s an increasing number of informational emails being sent. I know you can use search or filters but my goal is to have a clean archive system.</li>
+  <li>One new rule I’ve adopted is to minimize tagging emails with multiple archive labels. While the flexible label tagging is a huge perk of Gmail, it caused bloat in folders in my previous setup because it was too easy not having to think about which label will be best. Part of good organization is having a clear criteria and a consistent place to put each item. It takes some initial effort to develop consistency but it soon pays off.</li>
+</ol>
+
+<h3 id="special-case-labels">Special Case Labels</h3>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Keep</code></li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">Keep</code> is used in automations and its sole purpose is to ensure emails tagged with it are filtered out of automations that delete stale emails. More on this in the automation section.</p>
+
+<h2 id="my-new-email-workflow">My New Email Workflow</h2>
+
+<p>This is what my email time now looks like with the bulk of the emails auto-triaged and tagged:</p>
+
+<ol>
+  <li>Daily
+    <ol>
+      <li>Clear <code class="language-plaintext highlighter-rouge">Inbox</code> - triage only; is about 5% of weekly emails</li>
+      <li>Work on <code class="language-plaintext highlighter-rouge">0-Action</code> emails - small, focused set of emails</li>
+      <li>Quick scan on <code class="language-plaintext highlighter-rouge">0-Waiting</code> emails - another small set of emails; archive if an event occurred to close the email or move to <code class="language-plaintext highlighter-rouge">0-Action</code> label to be worked on</li>
+    </ol>
+  </li>
+  <li>Twice or thrice a week
+    <ol>
+      <li>Review <code class="language-plaintext highlighter-rouge">0-ThisWeek</code> emails - address or archive email once done; move to <code class="language-plaintext highlighter-rouge">0-Action</code> label if I wish to work on it later</li>
+      <li>Review <code class="language-plaintext highlighter-rouge">4-Subscriptions</code> as desired - mark with <code class="language-plaintext highlighter-rouge">Keep</code> label if I want to keep a particular email</li>
+    </ol>
+  </li>
+</ol>
+
+<p>The bulk of my emails end up in <code class="language-plaintext highlighter-rouge">0-ThisWeek</code> but now I’m not constantly pressured seeing the same emails multiple times a day. I’m more relaxed about it and can set an appropriate time in the week to process them knowing these are mainly informational or non-urgent emails.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">4-Subscriptions</code> emails are the least viewed as it doesn’t matter to me whether I view a bank’s annual privacy notice or some weekly sale - nothing is lost by not viewing it.</p>
+
+<h2 id="automation">Automation</h2>
+
+<p>Automation is the real effort saver and is implemented using Gmail filters. My rule of thumb: if an email shows up monthly or more frequently, it gets automated. I divide automations into 3 categories:</p>
+
+<ol>
+  <li>Triage Automations</li>
+  <li>Workflow Automations</li>
+  <li>Cleanup Automations</li>
+</ol>
+
+<h3 id="triage-automations">Triage Automations</h3>
+
+<p>Triage automations are used to tag emails with archive labels without moving them from <code class="language-plaintext highlighter-rouge">Inbox</code> e.g.</p>
+
+<ul>
+  <li>banking statement emails labeled with <code class="language-plaintext highlighter-rouge">1-Finance/Banking</code></li>
+  <li>medical privacy notice emails labeled with <code class="language-plaintext highlighter-rouge">4-Subscriptions/Health</code></li>
+</ul>
+
+<h3 id="workflow-automations">Workflow Automations</h3>
+
+<p>Workflow automations move emails from <code class="language-plaintext highlighter-rouge">Inbox</code> to:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">0-Action</code> folder, e.g.
+    <ul>
+      <li>Emails or newsletters of high importance like daily stock market brief</li>
+      <li>Bills requiring my action to pay</li>
+      <li>Package delivered email</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">0-Waiting</code> folder, e.g.
+    <ul>
+      <li>Bills that have auto-pay enabled</li>
+      <li>My “ordered item is being shipped” emails</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">0-ThisWeek</code> folder, e.g.
+    <ul>
+      <li>Low importance/urgency or informational emails like privacy notice, health newsletters</li>
+      <li>Payment confirmation emails</li>
+      <li>Online purchase receipts</li>
+    </ul>
+  </li>
+  <li><code class="language-plaintext highlighter-rouge">4-Subscriptions/xxxxx</code> folder, e.g.
+    <ul>
+      <li>Promotions or low importance newsletter emails (what I refer to as “junk” emails)</li>
+      <li>I chose to not pollute <code class="language-plaintext highlighter-rouge">0-ThisWeek</code> folder with certain emails like promotions or select newsletters as I only need to look at it when I’m interested. So these emails are archived immediately and left <code class="language-plaintext highlighter-rouge">unread</code> if I ever wish to view them</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="cleanup-automations">Cleanup Automations</h3>
+
+<p>Cleanup automations delete emails in a folder or by criteria older than 30, 60, or 90 days and are not labeled with <code class="language-plaintext highlighter-rouge">Keep</code>, e.g.</p>
+
+<ul>
+  <li>Promotional emails in <code class="language-plaintext highlighter-rouge">4-Subscriptions/xxxxx</code></li>
+  <li>Select newsletter emails in <code class="language-plaintext highlighter-rouge">4-Subscriptions/xxxxx</code></li>
+  <li>It keeps these folders in check so it’s easy to browse the folder and allows the <code class="language-plaintext highlighter-rouge">Keep</code> emails to be more visible</li>
+</ul>
+
+<p>I like how the <code class="language-plaintext highlighter-rouge">Keep</code> label nicely solves keeping select emails in the noisy <code class="language-plaintext highlighter-rouge">4-Subscriptions</code> folder without having to create a similar folder while preventing them from getting auto-deleted.</p>
+
+<h2 id="results">Results</h2>
+
+<p>This new system has cut my email effort ~80% and significantly improved response time on important items. At first, it felt a little complex and fragmenting the emails because I was used to viewing and organizing emails in a more conventional way. However, I quickly adapted and realized the true power of this system is grouping the emails by importance and urgency, allowing me to focus on a much smaller set of key emails daily and process the rest when I have more time. The automations are a huge help by doing the heavy lifting of tagging and initial triaging of all the periodic emails. Most importantly this feels a lot more sustainable by keeping the email processing load light and in smaller chunks.</p>
+
+<p>If you’re struggling to keep up with your inbox, I recommend reflecting on your pain points and brainstorming with AI on a custom email strategy that’s tailored to your needs over some general strategies that are prescribed by productivity articles. It took some thought and effort to implement, but the investment has been worth it. My inbox went from a source of background anxiety to something I look forward to processing.</p>]]></content><author><name></name></author><category term="productivity" /><category term="productivity" /><summary type="html"><![CDATA[My Near-Zero Inbox System I’ve tried several “zero inbox” strategies over the years but none of them have stuck. Most systems I tried had similar failures: they moved the mess somewhere else instead of helping to manage it, grew a backlog over time, and required high effort to stay functional. I’ve come up with a new strategy after brainstorming with ChatGPT - built around workflow, visibility, and automation - that finally stuck. The approach improves the signal-to-noise ratio by chunking emails by importance while Gmail filters handle the sorting automatically. (I use “label” and “folder” interchangeably to refer to Gmail’s label-based organizational system.) This system is built for Gmail, though the principles can apply to other compatible email services.]]></summary></entry><entry><title type="html">Markdown Viewer</title><link href="http://hmistry.github.io/software/2026/04/27/markdown-viewer.html" rel="alternate" type="text/html" title="Markdown Viewer" /><published>2026-04-27T00:00:00+00:00</published><updated>2026-04-27T00:00:00+00:00</updated><id>http://hmistry.github.io/software/2026/04/27/markdown-viewer</id><content type="html" xml:base="http://hmistry.github.io/software/2026/04/27/markdown-viewer.html"><![CDATA[<h2 id="problem">Problem</h2>
 
 <p>When working with Markdown files, I encounter the following challenges:</p>
 
@@ -901,4 +1095,4 @@ SQLite3 Results shown in next <a href="#typecasting">section #5</a>.</p>
 
 <p>Stay tuned… 😃</p>
 
-<p><em>Message posted 8 years and 7 months ago</em></p>]]></content><author><name></name></author><category term="misc" /><category term="misc" /><summary type="html"><![CDATA[puts "Hello Universe!" Stay tuned… 😃 Message posted 8 years and 7 months ago]]></summary></entry></feed>
+<p><em>Message posted 8 years and 8 months ago</em></p>]]></content><author><name></name></author><category term="misc" /><category term="misc" /><summary type="html"><![CDATA[puts "Hello Universe!" Stay tuned… 😃 Message posted 8 years and 8 months ago]]></summary></entry></feed>
