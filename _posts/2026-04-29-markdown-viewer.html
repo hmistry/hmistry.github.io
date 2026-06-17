@@ -1,0 +1,1112 @@
+---
+layout: null
+title: Markdown Viewer Tool
+date:   2026-04-29
+categories: software
+tags: html app
+excerpt_separator: <!--more-->
+permalink: /tools/markdown-viewer/
+---
+
+<!--
+  Markdown Viewer v1.0
+  github.com/hmistry/markdown-viewer
+  MIT License — Hiren Mistry 04/26/2026
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markdown Viewer v1.0</title>
+
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   Light: warm white canvas, slate text, crisp blue accent
+   Dark:  deep graphite, soft silver text, bright blue accent
+============================================================ */
+:root {
+  /* Surfaces */
+  --bg:           #f6f8fa;
+  --surface:      #ffffff;
+  --surface-alt:  #f0f2f5;
+
+  /* Text */
+  --text:         #1a1e27;
+  --text-muted:   #6b7280;
+  --text-faint:   #9ca3af;
+
+  /* Borders */
+  --border:       #d1d5db;
+  --border-soft:  #e5e7eb;
+
+  /* Accent */
+  --primary:      #2563eb;
+  --primary-dim:  #dbeafe;
+
+  /* Shadows */
+  --shadow-sm:    0 1px 2px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-md:    0 2px 8px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+
+  /* Typography */
+  --font-ui:      -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-mono:    "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+  --font-size-base: 14px;
+
+  /* Radius */
+  --radius:       8px;
+  --radius-sm:    5px;
+}
+
+body.dark {
+  --bg:           #0d1117;
+  --surface:      #161b22;
+  --surface-alt:  #1c2128;
+
+  --text:         #e6edf3;
+  --text-muted:   #8b949e;
+  --text-faint:   #484f58;
+
+  --border:       #30363d;
+  --border-soft:  #21262d;
+
+  --primary:      #4493f8;
+  --primary-dim:  #1c2a3f;
+
+  --shadow-sm:    0 1px 2px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-md:    0 2px 8px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   LAYOUT
+============================================================ */
+.container {
+  display: flex;
+  flex-direction: column;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 24px 0;
+}
+
+.main-layout {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+}
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 16px;
+  height: 48px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+.toolbar h1 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+}
+
+button:hover {
+  background: var(--surface-alt);
+  border-color: var(--primary);
+}
+
+button:active {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+button.primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 1px 3px rgba(37,99,235,0.25);
+}
+
+button.primary:hover {
+  filter: brightness(1.08);
+  border-color: transparent;
+}
+
+/* ============================================================
+   DROPZONE
+============================================================ */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 56px 40px;
+  margin-bottom: 0;
+  background: var(--surface);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.dropzone p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.dropzone p strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.dropzone .muted {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.dropzone.dragover {
+  border-color: var(--primary);
+  background: var(--primary-dim);
+}
+
+/* ============================================================
+   SIDEBAR TOC
+============================================================ */
+#toc-sidebar {
+  display: none;
+  width: 232px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 4px 20px 20px 0;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+#toc-sidebar::-webkit-scrollbar { width: 4px; }
+#toc-sidebar::-webkit-scrollbar-track { background: transparent; }
+#toc-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.toc-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 12px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.toc-controls span {
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.toc-controls span:not(.toc-divider):hover {
+  color: var(--primary);
+}
+
+.toc-divider {
+  cursor: default;
+}
+
+#toc-sidebar strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-faint);
+}
+
+#toc-sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#toc-sidebar li { margin: 0; padding: 0; }
+
+#toc-sidebar a {
+  display: block;
+  padding: 3px 6px 3px 0;
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-decoration: none;
+  line-height: 1.45;
+  border-radius: 3px;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#toc-sidebar a:hover {
+  color: var(--text);
+  background: var(--surface-alt);
+}
+
+#toc-sidebar a.active {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+#toc-sidebar li[data-level="1"] a { padding-left: 0; font-weight: 600; font-size: 13px; }
+#toc-sidebar li[data-level="2"] a { padding-left: 10px; }
+#toc-sidebar li[data-level="3"] a { padding-left: 20px; font-size: 12px; color: var(--text-faint); }
+#toc-sidebar li[data-level="3"] a:hover { color: var(--text); }
+#toc-sidebar li[data-level="3"] a.active { color: var(--primary); }
+
+/* Divider between sidebar and content */
+#toc-sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1px;
+  height: 100%;
+  background: var(--border-soft);
+}
+
+/* ============================================================
+   CONTENT AREA
+============================================================ */
+#content-wrapper {
+  flex: 1;
+  min-width: 0;
+  padding-left: 32px;
+}
+
+.markdown-body {
+  padding: 4px 0 64px;
+  /* Override github-markdown-css bg to use our tokens */
+  background: transparent !important;
+  color: var(--text) !important;
+  font-family: var(--font-ui) !important;
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+}
+
+/* Headings */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  color: var(--text) !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.02em;
+  border-bottom-color: var(--border-soft) !important;
+}
+
+/* Links */
+.markdown-body a { color: var(--primary) !important; }
+.markdown-body a:hover { text-decoration: underline; }
+
+/* Blockquote */
+.markdown-body blockquote {
+  border-left-color: var(--border) !important;
+  color: var(--text-muted) !important;
+  background: var(--surface-alt);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 4px 16px !important;
+  margin-left: 0 !important;
+}
+
+/* Inline code */
+.markdown-body code:not(pre code) {
+  background: var(--surface-alt) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border-soft) !important;
+  border-radius: 4px !important;
+  padding: 1px 5px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.875em !important;
+}
+
+/* Code blocks */
+.markdown-body pre {
+  position: relative;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--shadow-sm);
+  overflow: auto;
+  /* Custom scrollbar inside code blocks */
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.markdown-body pre::-webkit-scrollbar { height: 6px; }
+.markdown-body pre::-webkit-scrollbar-track { background: transparent; }
+.markdown-body pre::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.markdown-body pre code {
+  font-family: var(--font-mono) !important;
+  font-size: 13px !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  line-height: 1.5 !important;
+}
+
+/* Tables */
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+.markdown-body th {
+  background: var(--surface-alt) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  font-weight: 600;
+  text-align: left;
+}
+
+.markdown-body td {
+  border-color: var(--border-soft) !important;
+  color: var(--text) !important;
+}
+
+.markdown-body tr { background: transparent !important; }
+.markdown-body tr:nth-child(even) { background: var(--surface-alt) !important; }
+.markdown-body tr:hover { background: var(--primary-dim) !important; }
+
+/* HR */
+.markdown-body hr { border-color: var(--border-soft) !important; }
+
+/* ============================================================
+   COPY BUTTON
+============================================================ */
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.markdown-body pre:hover .copy-btn {
+  opacity: 1;
+}
+
+/* ============================================================
+   COLLAPSIBLE HEADINGS
+============================================================ */
+.section-content.collapsed { display: none; }
+
+#content h1 .toggle,
+#content h2 .toggle,
+#content h3 .toggle {
+  display: inline-block;
+  font-size: 1.2em;
+  margin-right: 6px;
+  opacity: 0.25;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.18s ease, opacity 0.15s;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+#content h1:hover .toggle,
+#content h2:hover .toggle,
+#content h3:hover .toggle { opacity: 0.7; }
+
+#content h1 .toggle.collapsed,
+#content h2 .toggle.collapsed,
+#content h3 .toggle.collapsed { transform: rotate(-90deg); }
+
+#content h1,
+#content h2,
+#content h3 { cursor: pointer; }
+
+/* ============================================================
+   INLINE TOC (print only)
+============================================================ */
+.toc-inline {
+  display: none;
+  border-left: 3px solid #ccc;
+  padding-left: 14px;
+  margin-bottom: 24px;
+  font-size: 13px;
+}
+
+.toc-inline ul {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+
+.toc-inline li[data-level="1"] { padding-left: 0; font-weight: 600; margin: 3px 0; }
+.toc-inline li[data-level="2"] { padding-left: 14px; margin: 2px 0; }
+.toc-inline li[data-level="3"] { padding-left: 28px; font-size: 12px; margin: 2px 0; }
+
+/* ============================================================
+   SCROLL TO TOP
+============================================================ */
+#topBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: none;
+  z-index: 100;
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  transition: color 0.15s, border-color 0.15s;
+}
+
+#topBtn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+/* ============================================================
+   PRINT
+============================================================ */
+@media print {
+  @page { margin: 0.5in 0.5in 0.5in 0.5in; }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  .toolbar, #topBtn, #dropzone, #toc-sidebar { display: none !important; }
+
+  .main-layout { display: block; }
+  #content-wrapper { padding-left: 0; }
+
+  .toc-inline { 
+    display: block !important; 
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+
+  .section-content.collapsed { display: block !important; }
+
+  #content h1 .toggle,
+  #content h2 .toggle,
+  #content h3 .toggle { display: none !important; }
+
+  #content h1 a,
+  #content h2 a,
+  #content h3 a,
+  #content h4 a { display: none !important;}
+
+  .markdown-body {
+    max-width: 100% !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+
+  h1, h2, h3, h4, pre, table { break-inside: avoid; page-break-inside: avoid; }
+
+  pre { white-space: pre-wrap; word-break: break-word; }
+
+  .copy-btn { display: none !important; }
+
+  .markdown-body p       { margin: 5px 0 !important; }
+  .markdown-body h1      { font-size: 18px !important; margin: 14px 0 6px !important; }
+  .markdown-body h2      { font-size: 15px !important; margin: 10px 0 5px !important; }
+  .markdown-body h3      { font-size: 13px !important; margin: 8px 0 4px !important; }
+  .markdown-body ul,
+  .markdown-body ol      { margin: 4px 0 4px 16px !important; }
+  .markdown-body li      { margin: 3px 0 !important; }
+  .markdown-body table   { font-size: 10px !important; }
+  .markdown-body pre code { font-size: 10px !important; line-height: 1.3 !important; }
+}
+</style>
+
+<link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/github-markdown-css@5.9.0/github-markdown.min.css">
+
+<!-- -----------------------------
+     markdown-it
+------------------------------ -->
+<script defer
+  src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.1/dist/markdown-it.min.js"></script>
+
+<!-- -----------------------------
+     DOMPurify
+------------------------------ -->
+<script defer
+  src="https://cdn.jsdelivr.net/npm/dompurify@3.4.1/dist/purify.min.js"></script>
+
+<!-- -----------------------------
+     Highlight.js
+------------------------------ -->
+
+<!-- <script defer
+  src="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/lib/common.min.js"></script> -->
+
+<script defer
+  src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+<!-- highlight.js theme (GitHub-like) -->
+<link id="hljs-theme" rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+
+<!-- -----------------------------
+     Initialize
+------------------------------ -->
+
+<script defer>
+let md;
+let dropzone, fileInput, content, topBtn, theme;
+
+/* -----------------------------
+   INIT
+----------------------------- */
+window.addEventListener("DOMContentLoaded", () => {
+
+  // Init libraries
+  md = window.markdownit({
+    html: false,
+    linkify: true,
+    typographer: true
+  });
+
+  // Cache DOM
+  dropzone = document.getElementById("dropzone");
+  fileInput = document.getElementById("fileInput");
+  content = document.getElementById("content");
+  topBtn = document.getElementById("topBtn");
+  theme = document.getElementById("hljs-theme");
+
+  // Auto-render when file is selected via input
+  fileInput.addEventListener("change", () => loadFile());
+
+  // Drag & drop
+  dropzone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropzone.classList.add("dragover");
+  });
+
+  dropzone.addEventListener("dragleave", () => {
+    dropzone.classList.remove("dragover");
+  });
+
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    loadFile(file); // validation happens inside loadFile
+  });
+
+  // Restore dark mode
+  if (localStorage.getItem("dark") === "true") {
+    document.body.classList.add("dark");
+    theme.href = "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css";
+    document.getElementById("darkBtn").textContent = "☽ Dark";
+  }
+
+  // Scroll handler
+  window.addEventListener("scroll", () => {
+  if (!topBtn) return;
+
+  topBtn.style.display = window.scrollY > 300 ? "block" : "none";  });
+});
+
+/* -----------------------------
+   Render Markdown
+----------------------------- */
+function renderMarkdown(raw) {
+  let html = md.render(raw);
+  html = DOMPurify.sanitize(html);
+
+  content.innerHTML = html;
+
+  setHeadingIDs();      // 1. assign IDs (no anchor links yet)
+  generateTOC();        // 2. build TOC from clean text + IDs
+  makeCollapsible();    // 3. wrap sections and add toggle behaviour
+  addAnchorLinks();     // 4. inject 🔗 links into headings
+  addCopyButtons();
+
+  if (window.hljs) {
+    hljs.highlightAll();
+  }
+}
+
+/* -----------------------------
+   Anchors
+----------------------------- */
+function setHeadingIDs() {
+  document.querySelectorAll("#content h1, #content h2, #content h3").forEach(h => {
+    h.id = h.innerText.trim().replace(/\s+/g, '-');
+  });
+}
+
+function addAnchorLinks() {
+  document.querySelectorAll("#content h1, #content h2, #content h3").forEach(h => {
+    const a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.textContent = " 🔗";
+    a.style.textDecoration = "none";
+    h.appendChild(a);
+  });
+}
+
+/* -----------------------------
+   TOC
+----------------------------- */
+function generateTOC() {
+  const headers = Array.from(document.querySelectorAll("#content h1, #content h2, #content h3"));
+  if (!headers.length) return;
+
+  const hasExplicitTOC = headers.some(h =>
+    /^table of contents$/i.test(h.innerText.trim())
+  );
+  if (hasExplicitTOC) return;
+
+  // Build shared list items HTML with data-level for indentation
+  let itemsHTML = '';
+  headers.forEach(h => {
+    const level = parseInt(h.tagName[1]);
+    const label = h.innerText.trim();
+    itemsHTML += `<li data-level="${level}"><a href="#${h.id}">${label}</a></li>`;
+  });
+
+  // --- Sidebar TOC (screen) ---
+  const sidebar = document.getElementById("toc-sidebar");
+  sidebar.innerHTML = `
+    <div class="toc-controls">
+      <span onclick="collapseAll()">collapse all</span>
+      <span class="toc-divider">|</span>
+      <span onclick="expandAll()">expand all</span>
+    </div>
+    <strong>Contents</strong>
+    <ul>${itemsHTML}</ul>
+  `;
+  sidebar.style.display = "block";
+
+  // --- Inline TOC (print only, injected into content) ---
+  const inlineTOC = document.createElement("div");
+  inlineTOC.className = "toc-inline";
+  inlineTOC.style.display = "none"; // hidden on screen, shown via print CSS
+  inlineTOC.innerHTML = `<strong>Contents</strong><ul>${itemsHTML}</ul>`;
+  content.prepend(inlineTOC);
+
+  // Active link highlighting on scroll
+  setupTOCHighlight(headers);
+}
+
+function setupTOCHighlight(headers) {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const id = entry.target.id;
+      const link = document.querySelector(`#toc-sidebar a[href="#${id}"]`);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        document.querySelectorAll("#toc-sidebar a.active").forEach(a => a.classList.remove("active"));
+        link.classList.add("active");
+      }
+    });
+  }, { rootMargin: "0px 0px -70% 0px", threshold: 0 });
+
+  headers.forEach(h => observer.observe(h));
+}
+
+/* -----------------------------
+   Collapsible headings
+----------------------------- */
+function makeCollapsible() {
+  // Process h1s at the top level, then recurse into their content for h2s, then h3s
+  wrapLevel(content, 1);
+}
+
+function wrapLevel(container, level) {
+  if (level > 3) return;
+
+  const tag = "H" + level;
+  // Work on a live snapshot of direct children
+  const children = Array.from(container.childNodes);
+
+  let i = 0;
+  while (i < children.length) {
+    const node = children[i];
+
+    if (node.nodeType === Node.ELEMENT_NODE && node.tagName === tag) {
+      // Collect all following siblings until the next same-or-higher heading
+      const sectionNodes = [];
+      let j = i + 1;
+      while (j < children.length) {
+        const sib = children[j];
+        if (
+          sib.nodeType === Node.ELEMENT_NODE &&
+          /^H[1-3]$/.test(sib.tagName) &&
+          parseInt(sib.tagName[1]) <= level
+        ) break;
+        sectionNodes.push(sib);
+        j++;
+      }
+
+      if (sectionNodes.length > 0) {
+        // Add toggle arrow
+        const toggle = document.createElement("span");
+        toggle.className = "toggle";
+        toggle.textContent = "▾";
+        node.prepend(toggle);
+
+        // Wrap section content
+        const sectionContent = document.createElement("div");
+        sectionContent.className = "section-content";
+        sectionContent.dataset.level = level;
+        sectionNodes.forEach(n => sectionContent.appendChild(n));
+        node.after(sectionContent);
+
+        // Click to collapse/expand
+        node.addEventListener("click", e => {
+          if (e.target.tagName === "A") return;
+          const isCollapsed = sectionContent.classList.toggle("collapsed");
+          toggle.classList.toggle("collapsed", isCollapsed);
+        });
+
+        // Update snapshot: the sectionNodes are now replaced by sectionContent
+        children.splice(i + 1, sectionNodes.length, sectionContent);
+
+        // Recurse into this section to process the next level down
+        wrapLevel(sectionContent, level + 1);
+      }
+    }
+    i++;
+  }
+}
+
+
+function addCopyButtons() {
+  document.querySelectorAll("pre").forEach(pre => {
+    const btn = document.createElement("button");
+    btn.textContent = "Copy";
+    btn.className = "copy-btn";
+
+    btn.onclick = () => {
+      const code = pre.querySelector("code")?.innerText || pre.innerText;
+      navigator.clipboard.writeText(code);
+      btn.textContent = "Copied!";
+      setTimeout(() => btn.textContent = "Copy", 1500);
+    };
+
+    pre.appendChild(btn);
+  });
+}
+
+/* -----------------------------
+   File type data (from hljs SUPPORTED_LANGUAGES.md)
+   ext -> hljs language alias. Only core-bundle languages
+   (the ~40 shipped in highlight.min.js) are listed so
+   the fence tag actually works without extra imports.
+----------------------------- */
+const EXT_TO_LANG = {
+  // Web
+  js: 'javascript', jsx: 'javascript', mjs: 'javascript',
+  ts: 'typescript', tsx: 'typescript', mts: 'typescript',
+  css: 'css', scss: 'scss', less: 'less',
+  html: 'html', htm: 'html', xml: 'xml', svg: 'xml',
+  json: 'json', jsonc: 'json',
+  // Systems
+  c: 'c', h: 'c',
+  cpp: 'cpp', cc: 'cpp', cxx: 'cpp', hpp: 'cpp', hxx: 'cpp',
+  cs: 'csharp',
+  java: 'java', jsp: 'java',
+  rs: 'rust',
+  go: 'go',
+  swift: 'swift',
+  kt: 'kotlin', kts: 'kotlin',
+  // Scripting
+  py: 'python', gyp: 'python',
+  rb: 'ruby', gemspec: 'ruby', thor: 'ruby',
+  pl: 'perl', pm: 'perl',
+  php: 'php',
+  lua: 'lua',
+  r: 'r',
+  // Shell
+  sh: 'bash', bash: 'bash', zsh: 'bash',
+  ps1: 'powershell',
+  // Data / config
+  yml: 'yaml', yaml: 'yaml',
+  toml: 'ini', ini: 'ini', cfg: 'ini', conf: 'ini',
+  sql: 'sql',
+  graphql: 'graphql', gql: 'graphql',
+  proto: 'proto',
+  // Infra / build
+  dockerfile: 'dockerfile',
+  tf: 'terraform', hcl: 'terraform',
+  gradle: 'gradle',
+  mk: 'makefile', mak: 'makefile',
+  // Functional
+  hs: 'haskell',
+  ml: 'ocaml',
+  ex: 'elixir', exs: 'elixir',
+  erl: 'erlang',
+  clj: 'clojure', cljs: 'clojure',
+  scala: 'scala',
+  dart: 'dart',
+  // Markup / doc
+  md: 'markdown', markdown: 'markdown',
+  tex: 'latex',
+  rst: 'plaintext',
+  txt: 'plaintext',
+  // Other common
+  vim: 'vim',
+  diff: 'diff', patch: 'diff',
+  bat: 'dos', cmd: 'dos',
+};
+
+// All extensions we'll accept (md + code files)
+const ACCEPTED_EXTS = new Set(Object.keys(EXT_TO_LANG));
+// Also accept files with no extension (e.g. Makefile, Dockerfile)
+const ACCEPTED_NOEXT_NAMES = new Set([
+  'makefile', 'dockerfile', 'gemfile', 'rakefile',
+  'procfile', 'vagrantfile', 'brewfile',
+]);
+
+function getFileExt(name) {
+  const dot = name.lastIndexOf('.');
+  return dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
+}
+
+function isMarkdownFile(ext) {
+  return ext === 'md' || ext === 'markdown';
+}
+
+function validateFile(file) {
+  const name = file.name;
+  const ext = getFileExt(name);
+  const baseLower = name.toLowerCase();
+
+  if (ext) {
+    if (!ACCEPTED_EXTS.has(ext)) {
+      return { ok: false, reason: `".${ext}" files are not supported.\nAccepted: text, markdown, and source code files.` };
+    }
+  } else {
+    // No extension — check known extensionless names
+    if (!ACCEPTED_NOEXT_NAMES.has(baseLower)) {
+      return { ok: false, reason: `"${name}" doesn't appear to be a text or code file.` };
+    }
+  }
+  return { ok: true };
+}
+
+function isNonAscii(text) {
+  // Allow printable ASCII + common whitespace (tab, newline, CR)
+  // Reject if >2% of first 8KB is non-ASCII — catches binary/UTF-16/images
+  const sample = text.slice(0, 8192);
+  let nonAscii = 0;
+  for (let i = 0; i < sample.length; i++) {
+    const code = sample.charCodeAt(i);
+    if ((code < 32 && code !== 9 && code !== 10 && code !== 13) || code > 126) {
+      nonAscii++;
+    }
+  }
+  return (nonAscii / sample.length) > 0.02;
+}
+
+function wrapCodeFile(filename, text) {
+  const ext = getFileExt(filename);
+  const baseLower = filename.toLowerCase();
+
+  // Pick language hint for the fence
+  let lang = EXT_TO_LANG[ext] || '';
+  // Extensionless overrides
+  if (!ext) {
+    if (baseLower === 'makefile' || baseLower === 'rakefile') lang = 'makefile';
+    else if (baseLower === 'dockerfile') lang = 'dockerfile';
+    else if (baseLower === 'gemfile' || baseLower === 'brewfile') lang = 'ruby';
+    else if (baseLower === 'vagrantfile') lang = 'ruby';
+    else if (baseLower === 'procfile') lang = 'plaintext';
+  }
+
+  // Escape any backtick fences in the source so they don't break the block
+  const safe = text.replace(/^`{3,}/gm, m => m.replace(/`/g, '‛'));
+
+  return `# ${filename}\n\n\`\`\`${lang}\n${safe}\n\`\`\`\n`;
+}
+
+/* -----------------------------
+   File handling
+----------------------------- */
+function loadFile(file) {
+  if (!file) file = fileInput.files[0];
+  if (!file) return;
+
+  const validation = validateFile(file);
+  if (!validation.ok) {
+    alert(validation.reason);
+    return;
+  }
+
+  const ext = getFileExt(file.name);
+  const reader = new FileReader();
+
+  reader.onload = e => {
+    let text = e.target.result;
+
+    // Reject binary/non-text content
+    if (isNonAscii(text)) {
+      alert(`"${file.name}" appears to be a binary file and cannot be displayed.`);
+      return;
+    }
+
+    // Wrap code files in a markdown template; pass markdown straight through
+    if (!isMarkdownFile(ext)) {
+      text = wrapCodeFile(file.name, text);
+    }
+
+    renderMarkdown(text);
+    dropzone.style.display = "none";
+  };
+
+  reader.onerror = () => alert("Failed to read file.");
+  reader.readAsText(file);
+}
+
+function openFile() {
+  fileInput.value = ""; // reset so same file can be re-selected
+  fileInput.click();
+}
+
+/* -----------------------------
+   Dark mode
+----------------------------- */
+function toggleDark() {
+  const isDark = document.body.classList.toggle("dark");
+  localStorage.setItem("dark", isDark);
+  const theme = document.getElementById("hljs-theme");
+  theme.href = isDark
+    ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css"
+    : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css";
+  document.getElementById("darkBtn").textContent = isDark ? "☽ Dark" : "☀ Light";
+}
+
+/* -----------------------------
+   Collapse / Expand all
+----------------------------- */
+function collapseAll() {
+  document.querySelectorAll("#content .section-content").forEach(sec => {
+    sec.classList.add("collapsed");
+  });
+  document.querySelectorAll("#content .toggle").forEach(t => {
+    t.classList.add("collapsed");
+  });
+}
+
+function expandAll() {
+  document.querySelectorAll("#content .section-content").forEach(sec => {
+    sec.classList.remove("collapsed");
+  });
+  document.querySelectorAll("#content .toggle").forEach(t => {
+    t.classList.remove("collapsed");
+  });
+}
+
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+</script>
+</head>
+
+<body>
+<div class="container">
+
+<div class="toolbar">
+  <h1>Markdown Viewer v1.0</h1>
+  <div class="toolbar-actions">
+    <button onclick="openFile()">Open file</button>
+    <button onclick="toggleDark()" id="darkBtn">☀ Light</button>
+  </div>
+</div>
+<!--more-->
+<div id="dropzone" class="dropzone">
+  <p><strong>Drop a Markdown or code file here</strong></p>
+  <p class="muted">or click to browse</p>
+  <input type="file" id="fileInput" accept="*" style="display:none">
+  <button class="primary" onclick="openFile()">Choose File</button>
+</div>
+
+<div class="main-layout">
+  <nav id="toc-sidebar"></nav>
+  <div id="content-wrapper">
+    <div id="content" class="markdown-body"></div>
+  </div>
+</div>
+
+</div>
+
+<button id="topBtn" onclick="scrollToTop()">↑ Top</button>
+
+</body>
+</html>
