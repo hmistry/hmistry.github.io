@@ -61,7 +61,7 @@ The solution consists of:
 How it works:
 
 - Bluetooth Temperature sensors can be placed in ideal locations in each room, sending temperature and humidity data to Home Assistant
-- The ESP32 HVAC Zone Controller is connected to zone dampers, HVAC furnace, and A/C Condenser. 
+- The ESP32 HVAC Zone Controller is connected to zone dampers, HVAC furnace, and A/C Condenser.
 - HVAC Zone Controller is setup to run the following:
   - Cycles: Off, Heat, Cool, Fan, Purge
   - Zones: All, Upstairs, Downstairs
