@@ -1,0 +1,1704 @@
+<!--
+  NEC Load Calc — NEC Residential Electrical Load Calculator
+  github.com/hmistry/nec-load-calc
+  MIT License — Hiren Mistry 06/16/2026
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEC Load Calc — NEC Residential Electrical Load Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f4f5f7;--surface:#fff;--surface-2:#f0f2f5;--surface-3:#e8eaee;
+  --border:#d4d8e0;--border-soft:#e8eaee;
+  --text:#1a1d24;--text-2:#4a5068;--text-3:#7a8099;
+  --accent:#1a56db;--accent-light:#e8effe;--accent-dark:#1040b0;
+  --success:#0e7c3a;--warn:#b45309;--warn-bg:#fef9ee;--danger:#be123c;--danger-bg:#fff1f4;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:6px;--r-lg:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+input,select,textarea,button{font-family:inherit;font-size:inherit}
+input[type=number]::-webkit-inner-spin-button{opacity:.5}
+
+/* Two-bar header */
+.top-bar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;gap:16px;height:50px;position:sticky;top:0;z-index:200;}
+.app-logo{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.app-logo span{color:var(--text-3);font-weight:400}
+.top-bar-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.tab-bar{background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;display:flex;align-items:flex-end;gap:2px;height:40px;position:sticky;top:50px;z-index:190;}
+.tab-btn{padding:6px 20px 8px;border:1px solid transparent;border-bottom:none;background:none;border-radius:var(--r) var(--r) 0 0;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-2);transition:all .15s;white-space:nowrap;}
+.tab-btn:hover{background:var(--surface-2);color:var(--text)}
+.tab-btn.active{background:var(--surface);color:var(--accent);border-color:var(--border);border-bottom-color:var(--surface);margin-bottom:-2px;font-weight:600}
+.tab-badge{display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:600;border-radius:10px;padding:1px 6px;margin-left:6px}
+
+/* Page wrap */
+.main-wrap{width:960px;min-width:720px;margin:0 auto;padding:28px 24px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:18px;overflow:hidden}
+.card-header{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border-soft);background:var(--surface-2)}
+.card-icon{width:18px;height:18px;color:var(--accent);flex-shrink:0}
+.card-title{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2)}
+.card-body{padding:18px}
+
+/* Form */
+.form-row{display:flex;gap:14px;margin-bottom:14px}
+.form-row:last-child{margin-bottom:0}
+.field{display:flex;flex-direction:column;gap:4px}
+.field.grow{flex:1}
+.field.w120{width:120px;flex-shrink:0}
+.field.w80{width:80px;flex-shrink:0}
+.field label{font-size:11.5px;font-weight:500;color:var(--text-2)}
+.field label .req{color:var(--danger);margin-left:2px}
+.field-note{font-size:11px;color:var(--text-3);margin-top:2px}
+input[type=text],input[type=number],select,textarea{height:34px;padding:0 9px;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);color:var(--text);transition:border-color .15s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,86,219,.12)}
+.radio-group{display:flex;gap:8px;flex-wrap:wrap;padding-top:4px}
+.radio-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid var(--border);border-radius:20px;cursor:pointer;font-size:12.5px;color:var(--text-2);transition:all .15s;user-select:none}
+.radio-pill input[type=radio]{accent-color:var(--accent)}
+.radio-pill:has(input:checked){background:var(--accent-light);border-color:#a8c0f0;color:var(--accent);font-weight:500}
+
+/* Load grid */
+.load-grid-header,.load-grid-row{display:grid;grid-template-columns:200px 90px 70px 55px 110px 1fr 28px;gap:6px;align-items:start}
+.load-grid-header{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding-bottom:7px;border-bottom:1px solid var(--border-soft);margin-bottom:6px;align-items:end}
+.load-grid-row{margin-bottom:5px}
+.load-grid-row input,.load-grid-row select{height:31px;font-size:12.5px}
+.load-grid-row input[readonly]{background:var(--surface-2);color:var(--text-2)}
+.load-grid-row.disabled-row{opacity:.4}
+.btn-remove{height:31px;width:28px;border:1px solid var(--border);border-radius:var(--r);background:none;cursor:pointer;color:var(--text-3);display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;flex-shrink:0}
+.btn-remove:hover{background:var(--danger-bg);border-color:#f0a0b0;color:var(--danger)}
+.btn-remove.fixed-btn{visibility:hidden}
+.df-auto{height:31px;display:flex;align-items:center;padding:0 8px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);font-size:11px;color:var(--text-3);font-family:var(--mono);cursor:help}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--r);font-size:12.5px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid transparent;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent-dark)}
+.btn-primary:hover{background:var(--accent-dark)}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{background:var(--surface-2)}
+.btn-ghost{background:none;color:var(--accent);border-color:transparent;padding-left:2px}
+.btn-ghost:hover{background:var(--accent-light)}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn-lg{padding:10px 26px;font-size:13.5px}
+.action-bar{display:flex;align-items:center;gap:10px;padding-top:16px;flex-wrap:wrap}
+
+/* Alerts */
+.alert{display:flex;gap:9px;padding:10px 13px;border-radius:var(--r);font-size:12.5px;line-height:1.5;margin-bottom:14px}
+.alert:last-child{margin-bottom:0}
+.alert-info{background:var(--accent-light);color:#1040a0;border:1px solid #b8d0f8}
+.alert-warn{background:var(--warn-bg);color:#854d0e;border:1px solid #f0d090}
+.alert-icon{flex-shrink:0;font-size:14px}
+
+/* Report */
+.report-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:16px}
+.report-title{font-size:19px;font-weight:600;margin-bottom:3px}
+.report-meta{font-size:11.5px;color:var(--text-3)}
+.report-stamp{text-align:right;font-family:var(--mono);font-size:11px;color:var(--text-3);line-height:1.8}
+.calc-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:14px}
+.calc-table th{text-align:left;padding:7px 11px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);border-bottom:2px solid var(--border)}
+.calc-table th.num{text-align:right}
+.calc-table td{padding:8px 11px;border-bottom:1px solid var(--border-soft);vertical-align:top}
+.calc-table td.num{text-align:right;font-family:var(--mono);font-size:12px}
+.calc-table tr.sec-head td{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-2);background:var(--surface-2);padding:5px 11px;border-bottom:1px solid var(--border)}
+.calc-table tr.subtotal td{font-weight:600;background:#f8f9fc;border-top:1px solid var(--border)}
+.calc-table tr.grand-total td{font-weight:700;font-size:13px;background:var(--accent-light);border-top:2px solid var(--accent);color:var(--accent-dark)}
+.calc-table tr.grand-total td.num{font-family:var(--mono);font-size:14px}
+.nec-ref{font-family:var(--mono);font-size:10px;color:var(--text-3);display:block;margin-top:1px}
+.service-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:18px 0}
+.svc-box{border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;text-align:center}
+.svc-box.primary{border-color:var(--accent);background:var(--accent-light)}
+.svc-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);margin-bottom:6px}
+.svc-box.primary .svc-label{color:var(--accent)}
+.svc-value{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1}
+.svc-box.primary .svc-value{font-size:30px;color:var(--accent-dark)}
+.svc-sub{font-size:11px;color:var(--text-3);margin-top:3px}
+
+/* Panel schedule */
+.panel-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px}
+.ps-stat{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r);padding:11px 13px}
+.ps-stat-label{font-size:11px;color:var(--text-3);margin-bottom:3px;font-weight:500}
+.ps-stat-value{font-family:var(--mono);font-size:17px;font-weight:600}
+.ps-stat-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.panel-wrap{overflow-x:auto}
+table.ps-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+table.ps-table colgroup col.cn{width:34px}
+table.ps-table colgroup col.ct{width:70px}
+table.ps-table colgroup col.cd{width:auto}
+table.ps-table colgroup col.ca{width:50px}
+table.ps-table colgroup col.cv{width:68px}
+table.ps-table colgroup col.cs{width:10px}
+table.ps-table thead th{background:#1e2230;color:#c0c5d5;padding:7px 5px;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;text-align:left}
+table.ps-table thead th.center{text-align:center}
+table.ps-table thead th.right{text-align:right}
+table.ps-table td{border:1px solid var(--border-soft);padding:2px 3px;vertical-align:middle}
+table.ps-table td.sep-col{background:#dde0e8;border:none;padding:0;width:10px}
+table.ps-table td.bn{font-family:var(--mono);font-size:11px;font-weight:700;text-align:center;background:var(--surface-2);padding:0}
+table.ps-table td.bn.L{color:var(--accent)}
+table.ps-table td.bn.R{color:var(--danger)}
+table.ps-table td.bn.locked{color:var(--text-3);background:var(--surface-3);font-weight:400}
+table.ps-table td.locked-cell{background:var(--surface-3);color:var(--text-3);font-size:11px;padding-left:6px}
+table.ps-table td.span-L{border-left:3px solid var(--accent);background:#f0f4ff}
+table.ps-table td.span-R{border-left:3px solid var(--danger);background:#fff0f3}
+table.ps-table td input,table.ps-table td select{height:24px;border:none;background:transparent;font-size:11.5px;padding:0 2px;width:100%}
+table.ps-table td input:focus,table.ps-table td select:focus{background:var(--accent-light);border-radius:2px;outline:1px solid var(--accent)}
+table.ps-table tr.tandem-b-row td{border-top:1px dashed #b8c0d8}
+
+/* Utility */
+.divider{border:none;border-top:1px solid var(--border-soft);margin:16px 0}
+.text-sm{font-size:12px}.text-muted{color:var(--text-3)}
+.load-subnote{font-size:11px;color:var(--text-3);margin-top:2px;font-family:var(--mono)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-3)}
+.empty-state .icon{font-size:30px;margin-bottom:8px}
+
+@media print{
+  body{background:#fff;font-size:10pt;--text-2: #1a1d24; --text-3: #444;}
+  .top-bar,.tab-bar,.no-print,.action-bar{display:none!important}
+  .tab-panel{display:block!important}
+  .main-wrap{padding:0;width:100%;min-width:0}
+  .card{box-shadow:none;border:1px solid #ccc}
+  body.print-report #tab-panel,body.print-report #tab-inputs{display:none!important}
+  body.print-panel #tab-report,body.print-panel #tab-inputs{display:none!important}
+  table.ps-table td input,table.ps-table td select{border:none;background:transparent}
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="app-logo">NEC Load Calc <span>/ Residential (V1.1)</span></div>
+  <div class="top-bar-actions">
+    <button class="btn btn-secondary btn-sm" id="btn-load">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 1v8M3.5 6l3 3 3-3"/><path d="M1 10v1.5a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V10"/></svg>
+      Load Worksheet
+    </button>
+    <button class="btn btn-secondary btn-sm" id="btn-save">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6.5 9V1M3.5 4l3-3 3 3"/><path d="M1 10v1.5a.5.5 0 0 0 .5.5h10a.5.5 0 0 0 .5-.5V10"/></svg>
+      Save Worksheet
+    </button>
+    <input type="file" id="file-input" accept=".json" style="display:none">
+  </div>
+</div>
+<!--more-->
+<div class="tab-bar">
+  <button class="tab-btn active" data-tab="inputs">Load Calculator</button>
+  <button class="tab-btn" data-tab="report">Report <span class="tab-badge" id="report-badge" style="display:none">✓</span></button>
+  <button class="tab-btn" data-tab="panel">Panel Schedule</button>
+</div>
+
+<div class="main-wrap">
+
+<!-- TAB 1: Load Calculator -->
+<div class="tab-panel active" id="tab-inputs">
+
+  <div class="alert alert-warn">
+    <span class="alert-icon">⚠</span>
+    <div><strong>Residential use only:</strong> For residential electrical load calculations only — NEC Article 220. Not for commercial or multi-family use. <br><strong>MIT License:</strong> This tool is provided AS-IS, without warranty of any kind. You are solely responsible for all calculations and compliance with your local code. Use at your own risk.</div>
+  </div>
+
+  <!-- Project Information -->
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="2" width="14" height="16" rx="2"/><line x1="7" y1="7" x2="13" y2="7"/><line x1="7" y1="10" x2="13" y2="10"/></svg>
+      <span class="card-title">Project Information</span>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field grow"><label>Project / Job Name</label><input type="text" id="proj-name" autocomplete="off" placeholder="e.g. Smith Residence"></div>
+        <div class="field grow"><label>Calculated By / License #</label><input type="text" id="proj-by" autocomplete="off" placeholder="Name / License #"></div>
+      </div>
+      <div class="form-row">
+        <div class="field grow"><label>Street Address</label><input type="text" id="proj-address" autocomplete="on" placeholder="123 Main Street"></div>
+      </div>
+      <div class="form-row">
+        <div class="field grow"><label>City</label><input type="text" id="proj-city" autocomplete="on" placeholder="City"></div>
+        <div class="field w80">
+          <label>State <span class="req">*</span></label>
+          <select id="proj-state">
+            <option value="">—</option>
+            <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+            <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+            <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+            <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+            <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+            <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+            <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+            <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+            <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+            <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+            <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+            <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+            <option>WI</option><option>WY</option><option>DC</option>
+          </select>
+        </div>
+        <div class="field w80"><label>ZIP</label><input type="text" id="proj-zip" autocomplete="on" placeholder="00000" maxlength="5"></div>
+      </div>
+
+      <hr class="divider">
+
+      <div id="code-info-banner" class="alert alert-info" style="display:none;margin-bottom:12px;">
+        <span class="alert-icon">ℹ</span><div id="code-info-text"></div>
+      </div>
+      <div id="code-mismatch-banner" class="alert alert-warn" style="display:none;margin-bottom:12px;">
+        <span class="alert-icon">⚠</span>
+        <div><strong>Code Override Active:</strong> Selected code differs from auto-detected code for this state. Verify with local AHJ before submission.</div>
+      </div>
+
+      <div class="form-row">
+        <div class="field grow">
+          <label>Applicable Electrical Code <span class="req">*</span></label>
+          <select id="code-select">
+            <option value="NEC2023">NEC 2023 (NFPA 70, 2023 Edition)</option>
+            <option value="NEC2020">NEC 2020 (NFPA 70, 2020 Edition)</option>
+            <option value="NEC2017">NEC 2017 (NFPA 70, 2017 Edition)</option>
+            <option value="CA2022">California Electrical Code 2022 (NEC 2020 based)</option>
+            <option value="NY2020">New York State Electrical Code 2020 (NEC 2017 based)</option>
+            <option value="FL2023">Florida Building Code – Electrical 2023 (NEC 2020 based)</option>
+            <option value="TX2023">Texas – NEC 2023 Adoption</option>
+          </select>
+          <span class="field-note">Auto-detected from state selection. Change only if your AHJ uses a different adoption.</span>
+        </div>
+      </div>
+
+      <div class="alert alert-warn" style="margin-top:4px;">
+        <span class="alert-icon">⚠</span>
+        <div>Code adoption varies by AHJ. Always verify the applicable edition with your local building department. Auto-detection is based on state-level adoption data as of May 2026 and may not reflect local amendments.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Building & Service -->
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 18V8l7-5 7 5v10H3z"/><rect x="8" y="12" width="4" height="6"/></svg>
+      <span class="card-title">Building &amp; Service Parameters</span>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field grow">
+          <label>Occupancy Type <span class="req">*</span></label>
+          <select id="occupancy">
+            <option value="single-family">Single-Family Dwelling</option>
+            <option value="condo">Condominium / Townhouse</option>
+            <option value="adu">Accessory Dwelling Unit (ADU)</option>
+          </select>
+        </div>
+        <div class="field grow">
+          <label>Construction Type <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-pill"><input type="radio" name="new-existing" value="new" checked> New Construction</label>
+            <label class="radio-pill"><input type="radio" name="new-existing" value="existing"> Existing</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field grow">
+          <label>Gross Floor Area (sq ft) <span class="req">*</span></label>
+          <input type="number" id="sqft" autocomplete="off" placeholder="e.g. 2400" min="100" max="99999">
+          <span class="field-note">General lighting = sq ft × 3 VA (NEC Tbl 220.12)</span>
+        </div>
+        <div class="field grow">
+          <label>Nominal Voltage System</label>
+          <div class="radio-group">
+            <label class="radio-pill"><input type="radio" name="voltage" value="240" checked> 120/240V</label>
+            <label class="radio-pill"><input type="radio" name="voltage" value="208"> 120/208V</label>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field grow">
+          <label>Service Size</label>
+          <select id="service-size">
+            <option value="auto">Determine from calculation</option>
+            <option value="100">100A</option>
+            <option value="125">125A</option>
+            <option value="150">150A</option>
+            <option value="200">200A</option>
+            <option value="225">225A</option>
+            <option value="320">320A</option>
+            <option value="400">400A</option>
+          </select>
+        </div>
+        <div class="field grow">
+          <label>Panels / Subpanels</label>
+          <select id="panel-count">
+            <option value="1">1 — Main only</option>
+            <option value="2">2 — Main + 1 sub</option>
+            <option value="3">3 — Main + 2 subs</option>
+          </select>
+        </div>
+        <div class="field w120">
+          <label>Small Appl. Ckts</label>
+          <select id="sa-circuits">
+            <option value="2">2 (min.)</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <span class="field-note">NEC 210.11(C)(1)</span>
+        </div>
+        <div class="field w120">
+          <label>Laundry Ckts</label>
+          <select id="laundry-circuits">
+            <option value="1">1 (min.)</option>
+            <option value="2">2</option>
+          </select>
+          <span class="field-note">NEC 210.11(C)(2)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculation Method -->
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg>
+      <span class="card-title">Calculation Method</span>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <label class="radio-pill" style="padding:12px 14px;border-radius:8px;flex-direction:column;align-items:flex-start;gap:4px;height:auto;">
+          <div style="display:flex;align-items:center;gap:7px;"><input type="radio" name="calc-method" value="optional" checked><strong>Optional Method</strong></div>
+          <div class="text-sm text-muted" style="padding-left:19px;">NEC 220.82 — Simplified demand on total load. Most common for residential.</div>
+        </label>
+        <label class="radio-pill" style="padding:12px 14px;border-radius:8px;flex-direction:column;align-items:flex-start;gap:4px;height:auto;">
+          <div style="display:flex;align-items:center;gap:7px;"><input type="radio" name="calc-method" value="standard"><strong>Standard Method</strong></div>
+          <div class="text-sm text-muted" style="padding-left:19px;">NEC 220.40+ — Per-load demand factors, more granular.</div>
+        </label>
+        <label class="radio-pill" id="method-measured-pill" style="padding:12px 14px;border-radius:8px;flex-direction:column;align-items:flex-start;gap:4px;height:auto;opacity:.4;pointer-events:none;">
+          <div style="display:flex;align-items:center;gap:7px;"><input type="radio" name="calc-method" value="measured" disabled><strong>Measured Load</strong></div>
+          <div class="text-sm text-muted" style="padding-left:19px;">NEC 220.87 — 12-month utility demand. Existing only.</div>
+        </label>
+      </div>
+      <div id="measured-fields" style="display:none;margin-top:14px;">
+        <div class="alert alert-info"><span class="alert-icon">ℹ</span><div>Enter max demand from 12-month utility billing data per NEC 220.87.</div></div>
+        <div class="form-row">
+          <div class="field grow"><label>Max 12-Month Demand (kW) <span class="req">*</span></label><input type="number" id="measured-kw" autocomplete="off" placeholder="e.g. 18.5" min="0" step="0.1"></div>
+          <div class="field grow"><label>Additional Load Being Added (VA)</label><input type="number" id="measured-add-va" autocomplete="off" placeholder="e.g. 10000" min="0"><span class="field-note">New load beyond existing measured demand</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed Appliances -->
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="16" height="12" rx="2"/><line x1="2" y1="9" x2="18" y2="9"/><circle cx="5.5" cy="7" r="1"/></svg>
+      <span class="card-title">Fixed Appliances</span>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info" style="margin-bottom:12px;"><span class="alert-icon">ℹ</span><div>Set <strong>Qty to 0</strong> to exclude an appliance, or <strong>1+</strong> to include it. Rating (VA) and voltage are pre-filled with typical values — adjust to match nameplate data.</div></div>
+      <div class="load-grid-header">
+        <div>Description</div><div>VA</div><div>Voltage</div>
+        <div title="Qty 0 = excluded from calculation">Qty</div>
+        <div title="Auto = NEC table demand factor applies. Enter 0–2 to override.">Demand Factor</div>
+        <div>Note</div><div></div>
+      </div>
+      <div id="fixed-list"></div>
+    </div>
+  </div>
+
+  <!-- HVAC Loads -->
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 3v14M3 10h14M5.5 5.5l9 9M14.5 5.5l-9 9"/></svg>
+      <span class="card-title">HVAC Loads</span>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info" style="margin-bottom:12px;"><span class="alert-icon">ℹ</span><div>Only the <strong>largest</strong> heating or cooling load is counted per NEC 220.60. Set qty to 0 to exclude. <strong>No electric HVAC?</strong> Leave all quantities at 0 — the section is excluded from the calculation.</div></div>
+      <div class="load-grid-header">
+        <div>Description</div><div>VA</div><div>Voltage</div>
+        <div>Qty</div><div>Demand Factor</div><div>Note</div><div></div>
+      </div>
+      <div id="hvac-list"></div>
+    </div>
+  </div>
+
+  <!-- Special Loads -->
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="10,2 13,8 19,8 14,12 16,18 10,14 4,18 6,12 1,8 7,8"/></svg>
+      <span class="card-title">Special Loads</span>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info" style="margin-bottom:12px;"><span class="alert-icon">ℹ</span><div>EV chargers, spas, pools, and other special loads use individual demand factors. Solar PV produces a negative offset reducing the total. Set qty to 0 to exclude.</div></div>
+      <div class="load-grid-header">
+        <div>Description</div><div>VA</div><div>Voltage</div>
+        <div>Qty</div><div>Demand Factor</div><div>Note</div><div></div>
+      </div>
+      <div id="special-list"></div>
+    </div>
+  </div>
+
+  <!-- Custom Loads -->
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="7"/><line x1="10" y1="7" x2="10" y2="13"/><line x1="7" y1="10" x2="13" y2="10"/></svg>
+      <span class="card-title">Custom Loads</span>
+    </div>
+    <div class="card-body">
+      <div class="alert alert-info" style="margin-bottom:12px;"><span class="alert-icon">ℹ</span><div>Add any load not covered above. Enter description, VA rating, voltage, quantity, and a demand factor (1.0 = full load; enter 0.75 for 75%, etc.).</div></div>
+      <div class="load-grid-header">
+        <div>Description</div><div>VA</div><div>Voltage</div>
+        <div>Qty</div>
+        <div title="Demand factor (0–2). 1.0 = full load.">Demand Factor</div>
+        <div>Note</div><div></div>
+      </div>
+      <div id="custom-list"></div>
+      <div class="action-bar">
+        <button class="btn btn-ghost btn-sm" id="add-custom">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="1" x2="6" y2="11"/><line x1="1" y1="6" x2="11" y2="6"/></svg>
+          Add Custom Load
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar" style="justify-content:flex-end;padding-top:4px;">
+    <button class="btn btn-primary btn-lg" id="btn-calculate">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="11" height="11" rx="2"/><line x1="5" y1="7.5" x2="10" y2="7.5"/><line x1="7.5" y1="5" x2="7.5" y2="10"/></svg>
+      Calculate Load
+    </button>
+  </div>
+</div>
+
+<!-- TAB 2: Report -->
+<div class="tab-panel" id="tab-report">
+  <div id="report-empty" class="empty-state">
+    <div class="icon">📋</div>
+    Complete inputs and click <strong>Calculate Load</strong> to generate the report.
+  </div>
+  <div id="report-content" style="display:none;">
+    <div class="card">
+      <div class="card-body">
+        <div class="report-header">
+          <div><div class="report-title" id="rpt-title"></div><div class="report-meta" id="rpt-meta"></div></div>
+          <div class="report-stamp" id="rpt-stamp"></div>
+        </div>
+        <div id="rpt-body"></div>
+        <div class="service-grid" id="rpt-service"></div>
+        <div id="rpt-notes"></div>
+      </div>
+    </div>
+    <div class="action-bar no-print">
+      <button class="btn btn-primary" id="btn-print-report">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="9" height="6" rx="1"/><path d="M4 5V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2"/></svg>
+        Print Report
+      </button>
+      <button class="btn btn-secondary" id="btn-populate-panel">Pre-populate Panel Schedule →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: Panel Schedule -->
+<div class="tab-panel" id="tab-panel">
+
+  <div id="panel-project-header" style="display:none;margin-bottom:18px;">
+    <div class="card">
+      <div class="card-body" style="padding:14px 18px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+          <div>
+            <div style="font-size:15px;font-weight:600;margin-bottom:3px;" id="pph-title"></div>
+            <div style="font-size:12px;color:var(--text-3);" id="pph-meta"></div>
+          </div>
+          <div style="text-align:right;font-family:var(--mono);font-size:11px;color:var(--text-3);line-height:1.8;" id="pph-stamp"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="2" width="14" height="16" rx="2"/><line x1="7" y1="6" x2="13" y2="6"/></svg>
+      <span class="card-title">Panel Configuration</span>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field grow"><label>Panel Designation</label><input type="text" id="panel-name" autocomplete="off" value="Panel A — Main"></div>
+        <div class="field w120">
+          <label>Main Breaker (A)</label>
+          <select id="panel-main-breaker">
+            <option>100</option><option>125</option><option>150</option>
+            <option selected>200</option><option>225</option><option>320</option><option>400</option>
+          </select>
+        </div>
+        <div class="field w120">
+          <label>Physical Slots</label>
+          <select id="panel-slots">
+            <option value="20">20</option><option value="24">24</option><option value="30">30</option>
+            <option value="40" selected>40</option><option value="42">42</option>
+            <option value="54">54</option><option value="66">66</option>
+          </select>
+        </div>
+        <div class="field w120">
+          <label>Bus Voltage</label>
+          <select id="panel-voltage">
+            <option value="240">120/240V 1Ø</option>
+            <option value="208">120/208V 3Ø</option>
+          </select>
+        </div>
+        <div class="field w120">
+          <label>Bus Rating (A)</label>
+          <select id="panel-bus">
+            <option>100</option><option>125</option><option>150</option>
+            <option selected>200</option><option>225</option><option>320</option><option>400</option>
+          </select>
+        </div>
+        <div class="field grow"><label>Location / Note</label><input type="text" id="panel-location" autocomplete="off" placeholder="e.g. Garage North Wall"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel-summary" id="panel-summary"></div>
+
+  <div class="card">
+    <div class="card-header">
+      <svg class="card-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="2" width="12" height="16" rx="2"/><line x1="8" y1="6" x2="12" y2="6"/></svg>
+      <span class="card-title">Circuit Schedule</span>
+      <div style="margin-left:auto;"><button class="btn btn-sm btn-ghost no-print" id="btn-reset-panel">Reset Circuits</button></div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="panel-wrap">
+        <table class="ps-table" id="ps-table">
+          <colgroup>
+            <col class="cn"><col class="ct"><col class="cd"><col class="ca"><col class="cv">
+            <col class="cs">
+            <col class="cn"><col class="ct"><col class="cd"><col class="ca"><col class="cv">
+          </colgroup>
+          <thead><tr>
+            <th class="center">#</th><th>Type</th><th>Description — Left Bus</th><th class="center">A</th><th class="right">VA</th>
+            <th></th>
+            <th class="center">#</th><th>Type</th><th>Description — Right Bus</th><th class="center">A</th><th class="right">VA</th>
+          </tr></thead>
+          <tbody id="ps-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar no-print">
+    <button class="btn btn-primary" id="btn-print-panel">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="9" height="6" rx="1"/><path d="M4 5V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2"/></svg>
+      Print Panel Schedule
+    </button>
+    <span class="text-sm text-muted">Change Type to 2P/3P/Tandem — adjacent slots lock automatically.</span>
+  </div>
+</div>
+
+</div><!-- main-wrap -->
+
+<script>
+'use strict';
+
+/* ── Schema constants ──────────────────────────────────────────── */
+const SCHEMA_VERSION = '1.1';
+const APP_ID = 'nec-load-calc-residential';
+
+/* ── Load definition arrays ────────────────────────────────────── */
+const FIXED_DEFS = [
+  { id:'range',       label:'Range (freestanding)',      defaultVA:12000, voltage:240, necRef:'NEC Tbl 220.55', dfAuto:true,  dfVal:1.0  },
+  { id:'cooktop',     label:'Cooktop',                   defaultVA:7200,  voltage:240, necRef:'NEC Tbl 220.55', dfAuto:true,  dfVal:1.0  },
+  { id:'oven',        label:'Wall Oven',                 defaultVA:5000,  voltage:240, necRef:'NEC Tbl 220.55', dfAuto:true,  dfVal:1.0  },
+  { id:'dryer',       label:'Clothes Dryer (electric)',  defaultVA:5000,  voltage:240, necRef:'NEC Tbl 220.54', dfAuto:true,  dfVal:1.0  },
+  { id:'dishwasher',  label:'Dishwasher',                defaultVA:1500,  voltage:120, necRef:'NEC 220.53',     dfAuto:true,  dfVal:1.0  },
+  { id:'disposal',    label:'Garbage Disposal',          defaultVA:900,   voltage:120, necRef:'NEC 220.53',     dfAuto:true,  dfVal:1.0  },
+  { id:'microwave',   label:'Microwave (built-in)',      defaultVA:1500,  voltage:120, necRef:'NEC 220.53',     dfAuto:true,  dfVal:1.0  },
+  { id:'waterheater', label:'Water Heater (electric)',   defaultVA:4500,  voltage:240, necRef:'NEC 220.82',     dfAuto:true,  dfVal:1.0  },
+  { id:'compactor',   label:'Trash Compactor',           defaultVA:1500,  voltage:120, necRef:'NEC 220.53',     dfAuto:true,  dfVal:1.0  },
+];
+
+const HVAC_DEFS = [
+  { id:'ac',        label:'Air Conditioning (cooling)',    defaultVA:0, voltage:240, necRef:'NEC 220.82(C)', dfAuto:true, dfVal:1.00 },
+  { id:'heatpump',  label:'Heat Pump (heating mode)',      defaultVA:0, voltage:240, necRef:'NEC 220.82(C)', dfAuto:true, dfVal:1.00 },
+  { id:'elec-heat', label:'Electric Resistance Heating',  defaultVA:0, voltage:240, necRef:'NEC 220.82(C)', dfAuto:true, dfVal:0.65 },
+  { id:'aux-heat',  label:'Auxiliary / Strip Heat',       defaultVA:0, voltage:240, necRef:'NEC 220.82(C)', dfAuto:true, dfVal:0.65 },
+  { id:'furnace',   label:'Furnace Blower Motor',         defaultVA:0, voltage:120, necRef:'NEC 220.82',    dfAuto:true, dfVal:1.00 },
+];
+
+const SPECIAL_DEFS = [
+  { id:'ev',       label:'EV Charger (EVSE)',       defaultVA:9600, voltage:240, necRef:'NEC 220.57',  dfAuto:true, dfVal:1.0  },
+  { id:'hottub',   label:'Hot Tub / Spa',           defaultVA:6000, voltage:240, necRef:'NEC 680.62', dfAuto:true, dfVal:1.0  },
+  { id:'pool',     label:'Swimming Pool Pump',      defaultVA:2000, voltage:240, necRef:'NEC 680.6',  dfAuto:true, dfVal:1.0  },
+  { id:'sauna',    label:'Sauna / Steam Room',      defaultVA:6000, voltage:240, necRef:'NEC 424',    dfAuto:true, dfVal:1.0  },
+  { id:'solar',    label:'Solar PV (offset, −VA)',  defaultVA:0,    voltage:240, necRef:'NEC 220.5',  dfAuto:true, dfVal:-1.0 },
+  { id:'battery',  label:'Battery Storage',         defaultVA:0,    voltage:240, necRef:'NEC 706',    dfAuto:true, dfVal:1.0  },
+  { id:'workshop', label:'Workshop / Subpanel',     defaultVA:0,    voltage:240, necRef:'NEC 220.14', dfAuto:true, dfVal:1.0  },
+];
+
+const STATE_CODES = {
+  AL:{e:'NEC2023'}, AK:{e:'NEC2020'}, AZ:{e:'NEC2023'}, AR:{e:'NEC2023'},
+  CA:{e:'CA2022',  n:'CEC 2022 is based on NEC 2020 with California amendments. Verify with local AHJ.'},
+  CO:{e:'NEC2023'}, CT:{e:'NEC2020'}, DE:{e:'NEC2023'},
+  FL:{e:'FL2023',  n:'FBC 2023 is based on NEC 2020 with Florida amendments. Verify with local AHJ.'},
+  GA:{e:'NEC2023'}, HI:{e:'NEC2020'}, ID:{e:'NEC2023'}, IL:{e:'NEC2023'}, IN:{e:'NEC2023'},
+  IA:{e:'NEC2023'}, KS:{e:'NEC2023'}, KY:{e:'NEC2023'}, LA:{e:'NEC2023'}, ME:{e:'NEC2023'},
+  MD:{e:'NEC2023'}, MA:{e:'NEC2020'}, MI:{e:'NEC2023'}, MN:{e:'NEC2020'}, MS:{e:'NEC2020'},
+  MO:{e:'NEC2023'}, MT:{e:'NEC2023'}, NE:{e:'NEC2023'}, NV:{e:'NEC2023'}, NH:{e:'NEC2023'},
+  NJ:{e:'NEC2023'}, NM:{e:'NEC2020'},
+  NY:{e:'NY2020',  n:'NYSEC 2020 is based on NEC 2017 with New York amendments. Verify with local AHJ.'},
+  NC:{e:'NEC2023'}, ND:{e:'NEC2023'}, OH:{e:'NEC2023'}, OK:{e:'NEC2023'}, OR:{e:'NEC2023'},
+  PA:{e:'NEC2023'}, RI:{e:'NEC2023'}, SC:{e:'NEC2023'}, SD:{e:'NEC2023'}, TN:{e:'NEC2023'},
+  TX:{e:'TX2023',  n:'Texas adopts NEC 2023. Local amendments may apply. Verify with local AHJ.'},
+  UT:{e:'NEC2023'}, VT:{e:'NEC2020'}, VA:{e:'NEC2023'}, WA:{e:'NEC2023'},
+  WV:{e:'NEC2023'}, WI:{e:'NEC2023'}, WY:{e:'NEC2023'}, DC:{e:'NEC2023'},
+};
+
+/* ── Load domain model ─────────────────────────────────────────── */
+class Load {
+  constructor({ id, description, ratedVA = 0, voltage = 240, quantity = 1,
+                dfAuto = false, dfVal = 1.0, note = '', necRef = '' }) {
+    Object.assign(this, { id, description, ratedVA, voltage, quantity, dfAuto, dfVal, note, necRef });
+  }
+  get connectedVA() { return this.ratedVA * this.quantity; }
+}
+
+/* ── Tab switching ─────────────────────────────────────────────── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + target).classList.add('active');
+  });
+});
+
+/* ── FMT — text casing utilities ──────────────────────────────── */
+const FMT = {
+  title(s) {
+    return String(s).replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+  },
+  sentence(s) {
+    const t = String(s).trim();
+    return t.charAt(0).toUpperCase() + t.slice(1).toLowerCase();
+  },
+  applyAll() {
+    ['proj-name', 'proj-address', 'proj-city', 'proj-by'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.value) el.value = FMT.title(el.value);
+    });
+    document.querySelectorAll('.load-note').forEach(el => {
+      if (el.value) el.value = FMT.sentence(el.value);
+    });
+    document.querySelectorAll('#custom-list .load-desc').forEach(el => {
+      if (el.value) el.value = FMT.title(el.value);
+    });
+  },
+};
+
+/* ── FMT blur listeners on project fields ──────────────────────── */
+['proj-name', 'proj-address', 'proj-city', 'proj-by'].forEach(id => {
+  document.getElementById(id).addEventListener('blur', function () {
+    if (this.value) this.value = FMT.title(this.value);
+  });
+});
+
+/* note fields use event delegation since rows are built dynamically */
+['#fixed-list', '#hvac-list', '#special-list', '#custom-list'].forEach(sel => {
+  document.querySelector(sel).addEventListener('blur', e => {
+    if (e.target.classList.contains('load-note') && e.target.value) {
+      e.target.value = FMT.sentence(e.target.value);
+    }
+  }, true);
+});
+
+/* custom load descriptions: Title Case on blur */
+document.getElementById('custom-list').addEventListener('blur', e => {
+  if (e.target.classList.contains('load-desc') && e.target.value) {
+    e.target.value = FMT.title(e.target.value);
+  }
+}, true);
+
+/* ── Load Worksheet button triggers file input ─────────────────── */
+document.getElementById('btn-load').addEventListener('click', () => {
+  document.getElementById('file-input').click();
+});
+
+/* ── CM — Code Manager (T-002) ─────────────────────────────────── */
+const CM = {
+  _detected: null,
+  detect() {
+    const state = document.getElementById('proj-state').value;
+    const codeEl = document.getElementById('code-select');
+    const infoBanner = document.getElementById('code-info-banner');
+    const infoText = document.getElementById('code-info-text');
+    const mismatchBanner = document.getElementById('code-mismatch-banner');
+    mismatchBanner.style.display = 'none';
+    if (!state) { infoBanner.style.display = 'none'; this._detected = null; return; }
+    const entry = STATE_CODES[state];
+    if (!entry) return;
+    this._detected = entry.e;
+    codeEl.value = entry.e;
+    if (entry.n) {
+      infoText.textContent = entry.n;
+      infoBanner.style.display = 'flex';
+    } else {
+      infoBanner.style.display = 'none';
+    }
+  },
+  checkMismatch() {
+    const state = document.getElementById('proj-state').value;
+    const code = document.getElementById('code-select').value;
+    const mismatchBanner = document.getElementById('code-mismatch-banner');
+    if (!state || !this._detected) return;
+    mismatchBanner.style.display = code !== this._detected ? 'flex' : 'none';
+  },
+};
+document.getElementById('proj-state').addEventListener('change', () => CM.detect());
+document.getElementById('code-select').addEventListener('change', () => CM.checkMismatch());
+
+/* ── T-003 — Construction type & calc method handlers ──────────── */
+document.querySelectorAll('[name="new-existing"]').forEach(r => {
+  r.addEventListener('change', function () {
+    const isNew = this.value === 'new';
+    const pill = document.getElementById('method-measured-pill');
+    const measuredRadio = document.querySelector('input[name="calc-method"][value="measured"]');
+    pill.style.opacity = isNew ? '0.4' : '';
+    pill.style.pointerEvents = isNew ? 'none' : '';
+    measuredRadio.disabled = isNew;
+    if (isNew && measuredRadio.checked) {
+      document.querySelector('input[name="calc-method"][value="optional"]').checked = true;
+      document.getElementById('measured-fields').style.display = 'none';
+    }
+  });
+});
+document.querySelectorAll('[name="calc-method"]').forEach(r => {
+  r.addEventListener('change', function () {
+    document.getElementById('measured-fields').style.display =
+      this.value === 'measured' ? 'block' : 'none';
+  });
+});
+
+/* ── LRB — Load Row Builder (T-004) ────────────────────────────── */
+const LRB = {
+  _cidx: 0,
+
+  _row(def, isCustom = false) {
+    const div = document.createElement('div');
+    div.className = 'load-grid-row' + (isCustom ? '' : ' disabled-row');
+    if (def.id) div.dataset.id = def.id;
+
+    const dfPct = Math.abs((def.dfVal ?? 1) * 100).toFixed(0);
+    const dfSign = (def.dfVal ?? 1) < 0 ? '−' : '';
+    const tip = `NEC demand factor auto-applied. Default: ${dfSign}${dfPct}%. Override by entering a number.`;
+    const v120 = def.voltage === 120;
+    const sel = `<select class="load-voltage"><option value="120"${v120?' selected':''}>120V</option><option value="240"${!v120?' selected':''}>240V</option></select>`;
+    const dfCell = def.dfAuto !== false
+      ? `<div class="df-auto" title="${tip}">Auto (NEC)</div>`
+      : `<input type="number" class="load-df" value="${(def.dfVal ?? 1).toFixed(2)}" min="-2" max="2" step="0.01">`;
+    const qtyVal = isCustom ? '1' : '0';
+    const removeClass = isCustom ? 'btn-remove' : 'btn-remove fixed-btn';
+
+    div.innerHTML =
+      `<input type="text" class="load-desc"${isCustom ? '' : ' readonly'} value="${isCustom ? '' : (def.label || '')}" placeholder="${isCustom ? 'Description' : ''}">` +
+      `<input type="number" class="load-va" value="${def.defaultVA || ''}" min="0">` +
+      sel +
+      `<input type="number" class="load-qty" value="${qtyVal}" min="${isCustom ? 1 : 0}" max="99">` +
+      dfCell +
+      `<input type="text" class="load-note" placeholder="Note">` +
+      `<button class="${removeClass}" type="button" title="Remove">✕</button>`;
+
+    div.querySelector('.load-qty').addEventListener('input', function () {
+      div.classList.toggle('disabled-row', parseInt(this.value) === 0 || this.value === '');
+    });
+    if (isCustom) {
+      div.querySelector('.btn-remove').addEventListener('click', () => div.remove());
+    }
+    return div;
+  },
+
+  _customRow() {
+    this._cidx++;
+    const def = { id: `c${this._cidx}`, label: '', defaultVA: '', voltage: 240, dfAuto: false, dfVal: 1.0 };
+    return this._row(def, true);
+  },
+
+  init() {
+    FIXED_DEFS.forEach(d => document.getElementById('fixed-list').appendChild(this._row(d)));
+    HVAC_DEFS.forEach(d => document.getElementById('hvac-list').appendChild(this._row(d)));
+    SPECIAL_DEFS.forEach(d => document.getElementById('special-list').appendChild(this._row(d)));
+    document.getElementById('add-custom').addEventListener('click', () => {
+      document.getElementById('custom-list').appendChild(this._customRow());
+    });
+  },
+};
+LRB.init();
+
+/* ── DFS — Demand Factor Service (T-007) ───────────────────────── */
+const DFS = {
+  rangeCalcVA(totalNameplateVA, qty) {
+    const tbl = [80, 75, 70, 66, 62, 59];
+    const pct = qty <= 6 ? tbl[qty - 1] : Math.max(40, 59 - (qty - 6) * 2);
+    return Math.round(totalNameplateVA * pct / 100);
+  },
+
+  dryerCalcVA(totalNameplateVA, qty) {
+    const pct = qty <= 4 ? 100 : qty === 5 ? 80 : qty === 6 ? 70 : Math.max(35, 70 - (qty - 6) * 5);
+    return Math.round(totalNameplateVA * pct / 100);
+  },
+
+  resolveFixed(id, connectedVA, qty) {
+    const cooking = ['range', 'cooktop', 'oven'];
+    if (cooking.includes(id)) {
+      const calcVA = this.rangeCalcVA(connectedVA, qty);
+      const tbl = [80, 75, 70, 66, 62, 59];
+      const pct = qty <= 6 ? tbl[qty - 1] : Math.max(40, 59 - (qty - 6) * 2);
+      return { calcVA, dfLabel: `Auto (Tbl 220.55 ${pct}%)`, necRef: 'NEC Tbl 220.55' };
+    }
+    if (id === 'dryer') {
+      const calcVA = this.dryerCalcVA(connectedVA, qty);
+      const pct = qty <= 4 ? 100 : qty === 5 ? 80 : qty === 6 ? 70 : Math.max(35, 70 - (qty - 6) * 5);
+      return { calcVA, dfLabel: `Auto (Tbl 220.54 ${pct}%)`, necRef: 'NEC Tbl 220.54' };
+    }
+    if (['dishwasher', 'disposal', 'microwave', 'compactor'].includes(id)) {
+      const df = qty >= 4 ? 0.75 : 1.0;
+      return { calcVA: Math.round(connectedVA * df), dfLabel: `Auto (${df * 100}%)`, necRef: 'NEC 220.53' };
+    }
+    return { calcVA: Math.round(connectedVA), dfLabel: 'Auto (100%)', necRef: 'NEC 220.82' };
+  },
+
+  lightingDemand(va) {
+    if (va <= 3000) return va;
+    if (va <= 120000) return 3000 + Math.round((va - 3000) * 0.35);
+    return 3000 + Math.round((120000 - 3000) * 0.35) + Math.round((va - 120000) * 0.25);
+  },
+
+  recService(amps) {
+    return [100, 125, 150, 200, 225, 320, 400].find(s => s >= amps) ?? 400;
+  },
+};
+
+/* ── IR — Input Reader (T-008) ─────────────────────────────────── */
+const IR = {
+  project() {
+    const r = n => document.querySelector(`[name="${n}"]:checked`);
+    return {
+      name:            document.getElementById('proj-name').value.trim(),
+      address:         document.getElementById('proj-address').value.trim(),
+      city:            document.getElementById('proj-city').value.trim(),
+      state:           document.getElementById('proj-state').value,
+      zip:             document.getElementById('proj-zip').value.trim(),
+      calculatedBy:    document.getElementById('proj-by').value.trim(),
+      codeEdition:     document.getElementById('code-select').value,
+      occupancy:       document.getElementById('occupancy').value,
+      isNew:           (r('new-existing') || {value:'new'}).value === 'new',
+      sqft:            parseFloat(document.getElementById('sqft').value) || 0,
+      voltageSystem:   parseInt((r('voltage') || {value:'240'}).value),
+      serviceSize:     document.getElementById('service-size').value,
+      panelCount:      parseInt(document.getElementById('panel-count').value),
+      saCircuits:      parseInt(document.getElementById('sa-circuits').value),
+      laundryCircuits: parseInt(document.getElementById('laundry-circuits').value),
+      calcMethod:      (r('calc-method') || {value:'optional'}).value,
+      measuredKW:      parseFloat(document.getElementById('measured-kw').value) || 0,
+      measuredAddVA:   parseFloat(document.getElementById('measured-add-va').value) || 0,
+    };
+  },
+
+  _section(listId, defs) {
+    const loads = [];
+    document.getElementById(listId).querySelectorAll('.load-grid-row').forEach(row => {
+      const qty = parseInt(row.querySelector('.load-qty').value) || 0;
+      if (qty === 0) return;
+      const id = row.dataset.id;
+      const def = defs ? defs.find(d => d.id === id) : null;
+      const ratedVA = parseFloat(row.querySelector('.load-va').value) || 0;
+      const voltage = parseInt(row.querySelector('.load-voltage').value);
+      const note = row.querySelector('.load-note').value.trim();
+      const isAuto = !!row.querySelector('.df-auto');
+      let dfVal = 1.0, _cv = 0, _dfLabel = '100%', necRef = def ? def.necRef : '';
+
+      if (isAuto && def) {
+        if (defs === FIXED_DEFS) {
+          const res = DFS.resolveFixed(id, ratedVA * qty, qty);
+          _cv = res.calcVA; _dfLabel = res.dfLabel; necRef = res.necRef;
+        } else {
+          dfVal = def.dfVal ?? 1.0;
+          _cv = Math.round(ratedVA * qty * dfVal);
+          const sign = dfVal < 0 ? '-' : '';
+          _dfLabel = `${sign}${Math.abs(dfVal * 100).toFixed(0)}%`;
+        }
+      } else {
+        dfVal = parseFloat(row.querySelector('.load-df').value) || 1.0;
+        _cv = Math.round(ratedVA * qty * dfVal);
+        _dfLabel = `${(dfVal * 100).toFixed(0)}%`;
+      }
+
+      const desc = row.querySelector('.load-desc').value.trim() || (def ? def.label : '');
+      const load = new Load({ id, description: desc, ratedVA, voltage, quantity: qty,
+                              dfAuto: isAuto, dfVal, note, necRef });
+      load._cv = _cv;
+      load._dfLabel = _dfLabel;
+      loads.push(load);
+    });
+    return loads;
+  },
+
+  fixed() {
+    const all = this._section('fixed-list', FIXED_DEFS);
+    // Combine all cooking appliances for NEC Tbl 220.55
+    const cookIds = new Set(['range', 'cooktop', 'oven']);
+    const cooking = all.filter(l => cookIds.has(l.id));
+    if (cooking.length > 0) {
+      const totalVA = cooking.reduce((s, l) => s + l.connectedVA, 0);
+      const totalQty = cooking.reduce((s, l) => s + l.quantity, 0);
+      const combined = DFS.rangeCalcVA(totalVA, totalQty);
+      const tbl = [80, 75, 70, 66, 62, 59];
+      const pct = totalQty <= 6 ? tbl[totalQty - 1] : Math.max(40, 59 - (totalQty - 6) * 2);
+      const label = `Auto (Tbl 220.55 ${pct}%)`;
+      let remaining = combined;
+      cooking.forEach((l, i) => {
+        if (i === cooking.length - 1) { l._cv = remaining; }
+        else { l._cv = Math.round(l.connectedVA * combined / totalVA); remaining -= l._cv; }
+        l._dfLabel = label;
+        l.necRef = 'NEC Tbl 220.55';
+      });
+    }
+    // NEC 220.53: 75% when total qty across all appliance types combined ≥ 4
+    const appIds = new Set(['dishwasher', 'disposal', 'microwave', 'compactor']);
+    const appliances = all.filter(l => appIds.has(l.id));
+    if (appliances.length > 0) {
+      const totalQty = appliances.reduce((s, l) => s + l.quantity, 0);
+      const df = totalQty >= 4 ? 0.75 : 1.0;
+      appliances.forEach(l => {
+        l._cv = Math.round(l.connectedVA * df);
+        l._dfLabel = `Auto (NEC 220.53 ${Math.round(df * 100)}%)`;
+      });
+    }
+    return all;
+  },
+  hvac()    { return this._section('hvac-list',    HVAC_DEFS); },
+  special() { return this._section('special-list', SPECIAL_DEFS); },
+
+  custom() {
+    const loads = [];
+    document.getElementById('custom-list').querySelectorAll('.load-grid-row').forEach(row => {
+      const desc = row.querySelector('.load-desc').value.trim();
+      const vaStr = row.querySelector('.load-va').value;
+      if (!desc && !vaStr) return;
+      const qty = parseInt(row.querySelector('.load-qty').value) || 0;
+      if (qty === 0) return;
+      const ratedVA = parseFloat(vaStr) || 0;
+      const voltage = parseInt(row.querySelector('.load-voltage').value);
+      const dfVal = parseFloat(row.querySelector('.load-df').value) || 1.0;
+      const note = row.querySelector('.load-note').value.trim();
+      const _cv = Math.round(ratedVA * qty * dfVal);
+      const load = new Load({ id: row.dataset.id || 'custom', description: desc,
+                              ratedVA, voltage, quantity: qty, dfAuto: false, dfVal, note, necRef: '' });
+      load._cv = _cv;
+      load._dfLabel = `${(dfVal * 100).toFixed(0)}%`;
+      loads.push(load);
+    });
+    return loads;
+  },
+
+  validate(p) {
+    const e = [];
+    if (!p.state) e.push('State is required.');
+    if (!p.sqft || p.sqft <= 0) e.push('Gross floor area (sq ft) must be greater than 0.');
+    if (p.calcMethod === 'measured' && (!p.measuredKW || p.measuredKW <= 0))
+      e.push('Measured demand (kW) must be greater than 0.');
+    return e;
+  },
+};
+
+/* ── CE — Calculation Engine (T-009 / T-010 / T-011) ───────────── */
+const CE = {
+  _result(method, p) {
+    return { method, codeEdition: p.codeEdition, voltageSystem: p.voltageSystem,
+             project: p, sections: [], totalConn: 0, totalCalc: 0,
+             totalAmps: 0, recService: 0, generatedAt: new Date() };
+  },
+
+  _sec(label, necRef, rows) {
+    const connVA = rows.reduce((s, l) => s + l.connectedVA, 0);
+    const calcVA = rows.reduce((s, l) => s + l._cv, 0);
+    return { label, necRef, rows, connVA, calcVA, note: '' };
+  },
+
+  _generalSec(p, dfFn, necRef, secNote) {
+    const lightVA = p.sqft * 3;
+    const saVA = p.saCircuits * 1500;
+    const laundryVA = p.laundryCircuits * 1500;
+    const totalVA = lightVA + saVA + laundryVA;
+    const calcTotal = dfFn(totalVA);
+    const df = totalVA > 0 ? calcTotal / totalVA : 1;
+
+    const mk = (id, desc, rVA, nRef) => {
+      const l = new Load({ id, description: desc, ratedVA: rVA, voltage: 240,
+                           quantity: 1, dfAuto: true, dfVal: df, note: '', necRef: nRef });
+      l._cv = Math.round(rVA * df);
+      l._dfLabel = (df * 100).toFixed(1) + '%';
+      return l;
+    };
+    const rows = [
+      mk('gen-lighting', 'General Lighting & Receptacles', lightVA, 'NEC Tbl 220.12'),
+      mk('gen-sa',      `Small Appliance (${p.saCircuits} × 1,500 VA)`, saVA, 'NEC 210.11(C)(1)'),
+      mk('gen-laundry', `Laundry (${p.laundryCircuits} × 1,500 VA)`, laundryVA, 'NEC 210.11(C)(2)'),
+    ].filter(l => l.ratedVA > 0);
+
+    // Fix rounding: ensure sub-row _cv sum equals calcTotal
+    const subSum = rows.reduce((s, l) => s + l._cv, 0);
+    if (rows.length > 0 && subSum !== calcTotal) rows[rows.length - 1]._cv += calcTotal - subSum;
+
+    const sec = this._sec('General Load', necRef, rows);
+    sec.calcVA = calcTotal;
+    if (secNote) sec.note = secNote;
+    return sec;
+  },
+
+  _fixedSec(loads) {
+    if (!loads.length) return null;
+    return this._sec('Fixed Appliances', 'NEC 220.53 / 220.54 / 220.55', loads);
+  },
+
+  _hvacSec(loads) {
+    if (!loads.length) return null;
+    const largest = loads.reduce((a, b) => a.connectedVA >= b.connectedVA ? a : b);
+    largest.note = (largest.note ? largest.note + ' ' : '') + '[Largest per NEC 220.60]';
+    return this._sec('HVAC Loads', 'NEC 220.60 / 220.82(C)', [largest]);
+  },
+
+  _genericSec(label, necRef, loads) {
+    return loads.length ? this._sec(label, necRef, loads) : null;
+  },
+
+  _finalize(r) {
+    r.totalConn = r.sections.reduce((s, sec) => s + sec.connVA, 0);
+    r.totalCalc = r.sections.reduce((s, sec) => s + sec.calcVA, 0);
+    r.totalAmps = Math.ceil(r.totalCalc / r.project.voltageSystem);
+    r.recService = DFS.recService(r.totalAmps);
+    return r;
+  },
+
+  optional(p, fixed, hvac, special, custom) {
+    const dfFn = va => va <= 10000 ? va : 10000 + Math.round((va - 10000) * 0.40);
+    const totalGenVA = p.sqft * 3 + p.saCircuits * 1500 + p.laundryCircuits * 1500;
+    const genNote = totalGenVA > 10000 ? 'First 10,000 VA @ 100%; remainder @ 40%' : '';
+    const r = this._result('Optional Method (NEC 220.82)', p);
+    r.sections = [
+      this._generalSec(p, dfFn, 'NEC 220.82(B)(1)', genNote),
+      this._fixedSec(fixed),
+      this._hvacSec(hvac),
+      this._genericSec('Special Loads', 'NEC 220.82(B)(4)', special),
+      this._genericSec('Custom Loads', 'NEC 220.14', custom),
+    ].filter(Boolean);
+    return this._finalize(r);
+  },
+
+  standard(p, fixed, hvac, special, custom) {
+    const r = this._result('Standard Method (NEC 220.40+)', p);
+    r.sections = [
+      this._generalSec(p, va => DFS.lightingDemand(va), 'NEC 220.41, Tbl 220.42', ''),
+      this._fixedSec(fixed),
+      this._hvacSec(hvac),
+      this._genericSec('Special Loads', 'NEC 220.14', special),
+      this._genericSec('Custom Loads', 'NEC 220.14', custom),
+    ].filter(Boolean);
+    return this._finalize(r);
+  },
+
+  measured(p, fixed, _hv, _sp, custom) {
+    const r = this._result('Measured Load Method (NEC 220.87)', p);
+    const existVA = Math.round(p.measuredKW * 1000 * 1.25);
+    const measLoad = new Load({ id: 'measured',
+      description: 'Existing Measured Demand (125% per NEC 220.87)',
+      ratedVA: Math.round(p.measuredKW * 1000), voltage: p.voltageSystem,
+      quantity: 1, dfAuto: true, dfVal: 1.25, note: '', necRef: 'NEC 220.87' });
+    measLoad._cv = existVA;
+    measLoad._dfLabel = '125%';
+    const secs = [this._sec('Existing Demand', 'NEC 220.87', [measLoad])];
+
+    if (p.measuredAddVA > 0) {
+      const addLoad = new Load({ id: 'add-load', description: 'Additional Load Being Added',
+        ratedVA: p.measuredAddVA, voltage: p.voltageSystem,
+        quantity: 1, dfAuto: false, dfVal: 1.0, note: '', necRef: 'NEC 220.87' });
+      addLoad._cv = p.measuredAddVA;
+      addLoad._dfLabel = '100%';
+      secs.push(this._sec('Additional Load', 'NEC 220.87', [addLoad]));
+    }
+    if (fixed.length) secs.push(this._fixedSec(fixed));
+    if (custom.length) secs.push(this._genericSec('Custom Loads', 'NEC 220.14', custom));
+    r.sections = secs.filter(Boolean);
+    return this._finalize(r);
+  },
+};
+
+/* ── RR — Report Renderer (T-013 / T-014) ──────────────────────── */
+const RR = {
+  fmt: n => Math.round(n).toLocaleString(),
+
+  render(result) {
+    const p = result.project;
+    document.getElementById('report-empty').style.display = 'none';
+    document.getElementById('report-content').style.display = 'block';
+    document.getElementById('report-badge').style.display = 'inline-block';
+
+    // Header
+    const title = p.name ? `Load Calculation — ${p.name}` : 'Residential Load Calculation';
+    document.getElementById('rpt-title').textContent = title;
+    const meta = [p.address, [p.city, p.state, p.zip].filter(Boolean).join(', ')].filter(Boolean);
+    if (p.sqft) meta.push(`${p.sqft.toLocaleString()} sq ft`);
+    meta.push(p.isNew ? 'New Construction' : 'Existing Construction');
+    document.getElementById('rpt-meta').textContent = meta.join(' · ');
+
+    // Stamp
+    const date = result.generatedAt.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+    const stampLines = [
+      `Code: ${result.codeEdition}`,
+      `Method: ${result.method.replace(/ \(.*\)/, '')}`,
+      `System: 120/${result.voltageSystem}V`,
+      `Date: ${date}`,
+    ];
+    if (p.calculatedBy) stampLines.push(`By: ${p.calculatedBy}`);
+    document.getElementById('rpt-stamp').innerHTML = stampLines.join('<br>');
+
+    document.getElementById('rpt-body').innerHTML = this._buildTable(result);
+    document.getElementById('rpt-service').innerHTML = this._buildService(result);
+    document.getElementById('rpt-notes').innerHTML =
+      `<div class="alert alert-warn" style="margin-top:18px;">
+        <span class="alert-icon">⚠</span>
+        <div><strong>Engineering estimate only.</strong> All installations require review by a licensed electrician and AHJ approval. Final service size subject to utility requirements and field conditions.</div>
+      </div>
+      <div class="alert alert-warn" style="margin-top:14px;" id="rpt-residential-disclaimer">
+        <span class="alert-icon">⚠</span>
+        <div><strong>Residential use only:</strong> For residential electrical load calculations only — NEC Article 220. Not for commercial or multi-family use. <br><strong>MIT License:</strong> This tool is provided AS-IS, without warranty of any kind. You are solely responsible for all calculations and compliance with your local code. Use at your own risk.</div>
+      </div>`;
+  },
+
+  _buildTable(result) {
+    let h = `<table class="calc-table"><thead><tr>
+      <th>Load Description</th><th class="num">Connected VA</th>
+      <th class="num">Demand Factor</th><th class="num">Calculated VA</th>
+      <th>NEC Reference</th></tr></thead><tbody>`;
+
+    result.sections.forEach(sec => {
+      h += `<tr class="sec-head"><td colspan="5">${sec.label}<span class="nec-ref">${sec.necRef}</span></td></tr>`;
+      sec.rows.forEach(load => {
+        const sub = load.note ? `<div class="load-subnote">${load.note}</div>` : '';
+        h += `<tr data-row-id="${load.id}">
+          <td>${load.description}${sub}</td>
+          <td class="num">${this.fmt(load.connectedVA)}</td>
+          <td class="num">${load._dfLabel || '—'}</td>
+          <td class="num col-calc-va" data-cv="${load._cv}">${this.fmt(load._cv)}</td>
+          <td><span class="nec-ref">${load.necRef || '—'}</span></td></tr>`;
+      });
+      const secSub = sec.note ? `<div class="load-subnote">${sec.note}</div>` : '';
+      h += `<tr class="subtotal">
+        <td>Section Total${secSub}</td>
+        <td class="num">${this.fmt(sec.connVA)}</td><td class="num">—</td>
+        <td class="num" data-section-calc="${sec.calcVA}">${this.fmt(sec.calcVA)}</td>
+        <td></td></tr>`;
+    });
+
+    h += `<tr class="grand-total">
+      <td>TOTAL CALCULATED LOAD</td>
+      <td class="num">${this.fmt(result.totalConn)}</td><td class="num">—</td>
+      <td class="num" data-total-calc="${result.totalCalc}">${this.fmt(result.totalCalc)} VA</td>
+      <td></td></tr></tbody></table>`;
+    return h;
+  },
+
+  _buildService(result) {
+    const p = result.project;
+    const auto = p.serviceSize === 'auto';
+    const recSvc = result.recService;
+    const title = auto ? 'Recommended Service' : 'User Specified Service';
+    const displayNum = auto ? recSvc : parseInt(p.serviceSize);
+    const sub = auto
+      ? `Next standard size ≥ ${result.totalAmps}A`
+      : `Recommended Size: ${recSvc}A`;
+    return `
+      <div class="svc-box">
+        <div class="svc-label">Total Connected Load</div>
+        <div class="svc-value">${this.fmt(result.totalConn)}</div>
+        <div class="svc-sub">VA</div>
+      </div>
+      <div class="svc-box">
+        <div class="svc-label">Calculated Load</div>
+        <div class="svc-value" data-total-amps="${result.totalAmps}">${this.fmt(result.totalCalc)}</div>
+        <div class="svc-sub">VA / ${result.totalAmps}A</div>
+      </div>
+      <div class="svc-box primary">
+        <div class="svc-label" id="rpt-service-title">${title}</div>
+        <div class="svc-value" data-rec-service="${recSvc}">${displayNum}A</div>
+        <div class="svc-sub" id="rpt-service-sub">${sub}</div>
+      </div>`;
+  },
+};
+
+/* ── Calculate button orchestration (T-012) ────────────────────── */
+let lastResult = null;
+
+document.getElementById('btn-calculate').addEventListener('click', () => {
+  FMT.applyAll();
+  const p = IR.project();
+  const errs = IR.validate(p);
+  if (errs.length) { alert(errs.join('\n')); return; }
+
+  const fixed = IR.fixed(), hvac = IR.hvac(), special = IR.special(), custom = IR.custom();
+  lastResult = p.calcMethod === 'standard' ? CE.standard(p, fixed, hvac, special, custom)
+             : p.calcMethod === 'measured'  ? CE.measured(p, fixed, hvac, special, custom)
+             : CE.optional(p, fixed, hvac, special, custom);
+  RR.render(lastResult);
+
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(tp => tp.classList.remove('active'));
+  document.querySelector('.tab-btn[data-tab="report"]').classList.add('active');
+  document.getElementById('tab-report').classList.add('active');
+});
+
+/* ── PC — Panel Controller (T-016 through T-021) ───────────────── */
+const PC = {
+  L: [],
+  R: [],
+
+  _init(slotCount) {
+    const half = Math.floor(slotCount / 2);
+    this.L = Array.from({ length: half }, (_, i) => ({ num: i * 2 + 1, type: '1P', desc: '', amps: '', va: '', tanB: null }));
+    this.R = Array.from({ length: half }, (_, i) => ({ num: i * 2 + 2, type: '1P', desc: '', amps: '', va: '', tanB: null }));
+  },
+
+  _render() {
+    const tbody = document.getElementById('ps-tbody');
+    tbody.innerHTML = '';
+    for (let i = 0; i < this.L.length; i++) {
+      const L = this.L[i], R = this.R[i];
+      const tanL = L.type === 'TanA', tanR = R.type === 'TanA';
+      const needsB = tanL || tanR;
+      // rowspan=2 on the non-tandem side when one side is tandem
+      const rsL = (!tanL && tanR) ? 2 : 1;
+      const rsR = (tanL && !tanR) ? 2 : 1;
+
+      const trA = document.createElement('tr');
+      trA.innerHTML =
+        this._cellsA(L, 'L', i, rsL) +
+        `<td class="sep-col"${needsB ? ' rowspan="2"' : ''}></td>` +
+        this._cellsA(R, 'R', i, rsR);
+      tbody.appendChild(trA);
+
+      if (needsB) {
+        const trB = document.createElement('tr');
+        trB.className = 'tandem-b-row';
+        if (tanL) trB.innerHTML += this._cellsB(L, 'L', i);
+        if (tanR) trB.innerHTML += this._cellsB(R, 'R', i);
+        tbody.appendChild(trB);
+      }
+    }
+    this._updateSummary();
+  },
+
+  _cellsA(slot, side, idx, rowspan) {
+    const rs = rowspan > 1 ? ` rowspan="${rowspan}"` : '';
+    if (slot.type === 'locked') {
+      const arr = side === 'L' ? this.L : this.R;
+      let parentNum = slot.num - 2;
+      for (let j = idx - 1; j >= 0; j--) {
+        if (arr[j].type === '2P' || arr[j].type === '3P') { parentNum = arr[j].num; break; }
+      }
+      return `<td class="bn ${side} locked"${rs}>—</td>` +
+        `<td${rs}><select disabled data-key="${side}${idx}" data-f="type"><option value="locked" selected>(locked)</option></select></td>` +
+        `<td class="locked-cell" colspan="3"${rs}>↑ ${parentNum}+${slot.num}</td>`;
+    }
+    const opts = ['1P','2P','3P','TanA'].map(t =>
+      `<option value="${t}"${t === slot.type ? ' selected' : ''}>${t}</option>`).join('');
+    return `<td class="bn ${side}"${rs}>${slot.num}</td>` +
+      `<td${rs}><select data-key="${side}${idx}" data-f="type">${opts}</select></td>` +
+      `<td${rs}><input type="text" data-key="${side}${idx}" data-f="desc" value="${slot.desc}" placeholder="Description"></td>` +
+      `<td${rs}><input type="number" data-key="${side}${idx}" data-f="amps" value="${slot.amps}" placeholder="A" min="0"></td>` +
+      `<td${rs}><input type="number" data-key="${side}${idx}" data-f="va" value="${slot.va}" placeholder="VA" min="0"></td>`;
+  },
+
+  _cellsB(slot, side, idx) {
+    const b = slot.tanB || { desc: '', amps: '', va: '' };
+    return `<td class="bn ${side}"></td><td></td>` +
+      `<td><input type="text" data-key="${side}${idx}B" data-f="desc" value="${b.desc}" placeholder="Circuit B"></td>` +
+      `<td><input type="number" data-key="${side}${idx}B" data-f="amps" value="${b.amps}" placeholder="A" min="0"></td>` +
+      `<td><input type="number" data-key="${side}${idx}B" data-f="va" value="${b.va}" placeholder="VA" min="0"></td>`;
+  },
+
+  _onInput(e) {
+    const el = e.target;
+    if (el.tagName === 'SELECT') return;
+    const key = el.dataset.key;
+    if (!key) return;
+    const isB = key.endsWith('B');
+    const realKey = isB ? key.slice(0, -1) : key;
+    const side = realKey[0], idx = parseInt(realKey.slice(1));
+    const arr = side === 'L' ? this.L : this.R;
+    if (!arr[idx]) return;
+    if (isB) {
+      if (!arr[idx].tanB) arr[idx].tanB = { desc: '', amps: '', va: '' };
+      arr[idx].tanB[el.dataset.f] = el.value;
+    } else {
+      arr[idx][el.dataset.f] = el.value;
+    }
+    if (el.dataset.f === 'va') this._updateSummary();
+  },
+
+  _onTypeChange(e) {
+    const el = e.target;
+    if (el.dataset.f !== 'type') return;
+    const side = el.dataset.key[0], idx = parseInt(el.dataset.key.slice(1));
+    const arr = side === 'L' ? this.L : this.R;
+    const slot = arr[idx];
+    const prevType = slot.type, newType = el.value;
+    if (newType === prevType) return;
+
+    // Validate before modifying state
+    if (newType === '2P') {
+      if (!arr[idx + 1] || arr[idx + 1].type === 'locked' || arr[idx + 1].type === 'TanA') {
+        alert(`Cannot place 2P at slot ${slot.num} — insufficient adjacent free slots.`);
+        this._render(); return;
+      }
+    } else if (newType === '3P') {
+      if (!arr[idx + 1] || !arr[idx + 2] ||
+          arr[idx + 1].type === 'locked' || arr[idx + 1].type === 'TanA' ||
+          arr[idx + 2].type === 'locked' || arr[idx + 2].type === 'TanA') {
+        alert(`Cannot place 3P at slot ${slot.num} — insufficient adjacent free slots.`);
+        this._render(); return;
+      }
+    }
+
+    // Unlock slots from previous type
+    if (prevType === '2P' && arr[idx + 1] && arr[idx + 1].type === 'locked') arr[idx + 1].type = '1P';
+    if (prevType === '3P') {
+      if (arr[idx + 1] && arr[idx + 1].type === 'locked') arr[idx + 1].type = '1P';
+      if (arr[idx + 2] && arr[idx + 2].type === 'locked') arr[idx + 2].type = '1P';
+    }
+    if (prevType === 'TanA') slot.tanB = null;
+
+    // Apply new type
+    slot.type = newType;
+    if (newType === '2P') { arr[idx + 1].type = 'locked'; }
+    else if (newType === '3P') { arr[idx + 1].type = 'locked'; arr[idx + 2].type = 'locked'; }
+    else if (newType === 'TanA') { slot.tanB = { desc: '', amps: '', va: '' }; }
+
+    this._render();
+  },
+
+  _updateSummary() {
+    const busVoltage = parseInt(document.getElementById('panel-voltage').value) || 240;
+    const mainBreaker = parseInt(document.getElementById('panel-main-breaker').value) || 200;
+    const slotCount = parseInt(document.getElementById('panel-slots').value) || 40;
+    let totalVA = 0, circuitsUsed = 0;
+    [...this.L, ...this.R].forEach(slot => {
+      if (slot.type === 'locked') return;
+      totalVA += parseInt(slot.va) || 0;
+      if (slot.tanB) totalVA += parseInt(slot.tanB.va) || 0;
+      if (slot.desc || slot.va) circuitsUsed++;
+    });
+    const loadCurrent = (totalVA / busVoltage).toFixed(1);
+    const capPct = Math.round(parseFloat(loadCurrent) / mainBreaker * 100);
+    const capColor = capPct <= 75 ? 'var(--success)' : capPct <= 90 ? 'var(--warn)' : 'var(--danger)';
+    document.getElementById('panel-summary').innerHTML =
+      `<div class="ps-stat"><div class="ps-stat-label">Total Load</div><div class="ps-stat-value">${totalVA.toLocaleString()}</div><div class="ps-stat-sub">VA</div></div>` +
+      `<div class="ps-stat"><div class="ps-stat-label">Load Current</div><div class="ps-stat-value">${loadCurrent}</div><div class="ps-stat-sub">Amps</div></div>` +
+      `<div class="ps-stat"><div class="ps-stat-label">Capacity Used</div><div class="ps-stat-value" style="color:${capColor}">${capPct}%</div><div class="ps-stat-sub">of ${mainBreaker}A main</div></div>` +
+      `<div class="ps-stat"><div class="ps-stat-label">Physical Slots</div><div class="ps-stat-value">${slotCount}</div><div class="ps-stat-sub">${slotCount / 2} pairs</div></div>` +
+      `<div class="ps-stat"><div class="ps-stat-label">Circuits Used</div><div class="ps-stat-value">${circuitsUsed}</div><div class="ps-stat-sub">of ${slotCount} slots</div></div>`;
+  },
+
+  populate(result) {
+    const hasData = [...this.L, ...this.R].some(
+      s => s.type !== 'locked' && (s.desc || s.va || (s.tanB && (s.tanB.desc || s.tanB.va)))
+    );
+    if (hasData && !confirm('Re-populating will reset all circuit assignments. Continue?')) return;
+
+    const slotCount = parseInt(document.getElementById('panel-slots').value) || 40;
+    this._init(slotCount);
+
+    const assigns = [
+      { desc: 'General Lighting', amps: '15', va: '', voltage: 120 },
+      { desc: 'Small Appliance 1', amps: '20', va: '', voltage: 120 },
+      { desc: 'Laundry', amps: '20', va: '', voltage: 120 },
+    ];
+    result.sections.forEach(sec => {
+      if (sec.label === 'General Load') return;
+      sec.rows.forEach(load => {
+        assigns.push({ desc: load.description, amps: '', va: String(Math.max(0, load._cv)), voltage: load.voltage || 240 });
+      });
+    });
+
+    let li = 0, ri = 0;
+    assigns.forEach((a, i) => {
+      const goL = i % 2 === 0;
+      const arr = goL ? this.L : this.R;
+      const idx = goL ? li : ri;
+      if (idx >= arr.length) return;
+      if (a.voltage === 240 && arr[idx + 1] && arr[idx + 1].type !== 'locked' && arr[idx + 1].type !== 'TanA') {
+        arr[idx].type = '2P'; arr[idx + 1].type = 'locked';
+        arr[idx].desc = a.desc; arr[idx].amps = a.amps; arr[idx].va = a.va;
+        if (goL) li += 2; else ri += 2;
+      } else {
+        arr[idx].type = '1P';
+        arr[idx].desc = a.desc; arr[idx].amps = a.amps; arr[idx].va = a.va;
+        if (goL) li += 1; else ri += 1;
+      }
+    });
+
+    const p = result.project;
+    document.getElementById('panel-project-header').style.display = '';
+    document.getElementById('pph-title').textContent = p.name || 'Residential Load Calculation';
+    const meta = [p.address, [p.city, p.state, p.zip].filter(Boolean).join(', ')].filter(Boolean);
+    document.getElementById('pph-meta').textContent = meta.join(' · ');
+    const date = result.generatedAt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    document.getElementById('pph-stamp').innerHTML =
+      `Code: ${result.codeEdition}<br>Method: ${result.method.replace(/ \(.*\)/, '')}<br>Date: ${date}`;
+
+    this._render();
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(tp => tp.classList.remove('active'));
+    document.querySelector('.tab-btn[data-tab="panel"]').classList.add('active');
+    document.getElementById('tab-panel').classList.add('active');
+  },
+
+  init() {
+    const slotCount = parseInt(document.getElementById('panel-slots').value) || 40;
+    this._init(slotCount);
+    this._render();
+
+    const tbody = document.getElementById('ps-tbody');
+    tbody.addEventListener('change', e => { if (e.target.dataset.f === 'type') this._onTypeChange(e); });
+    tbody.addEventListener('input', e => this._onInput(e));
+
+    document.getElementById('panel-slots').addEventListener('change', function () {
+      PC._init(parseInt(this.value)); PC._render();
+    });
+    document.getElementById('panel-main-breaker').addEventListener('change', () => this._updateSummary());
+    document.getElementById('panel-voltage').addEventListener('change', () => this._updateSummary());
+    document.getElementById('btn-reset-panel').addEventListener('click', () => {
+      this._init(parseInt(document.getElementById('panel-slots').value) || 40);
+      this._render();
+    });
+  },
+};
+PC.init();
+
+/* ── IO — Worksheet Save / Load (T-022, T-023) ─────────────────── */
+const IO = {
+  save() {
+    FMT.applyAll();
+    const g = id => document.getElementById(id);
+    const data = {
+      _app: APP_ID,
+      _schema: SCHEMA_VERSION,
+      _exported: new Date().toISOString(),
+      project: {
+        name: g('proj-name').value,
+        address: g('proj-address').value,
+        city: g('proj-city').value,
+        state: g('proj-state').value,
+        zip: g('proj-zip').value,
+        calculatedBy: g('proj-by').value,
+        codeEdition: g('code-select').value,
+        occupancy: g('occupancy').value,
+        isNew: document.querySelector('input[name="new-existing"]:checked').value === 'new',
+        sqft: g('sqft').value,
+        voltageSystem: document.querySelector('input[name="voltage"]:checked').value,
+        serviceSize: g('service-size').value,
+        panelCount: g('panel-count').value,
+        saCircuits: g('sa-circuits').value,
+        laundryCircuits: g('laundry-circuits').value,
+        calcMethod: document.querySelector('input[name="calc-method"]:checked').value,
+        measuredKW: g('measured-kw').value,
+        measuredAddVA: g('measured-add-va').value,
+      },
+      loads: {},
+    };
+
+    ['fixed', 'hvac', 'special'].forEach(sec => {
+      const defs = sec === 'fixed' ? FIXED_DEFS : sec === 'hvac' ? HVAC_DEFS : SPECIAL_DEFS;
+      data.loads[sec] = defs.map(def => {
+        const row = document.querySelector(`#${sec}-list [data-id="${def.id}"]`);
+        if (!row) return null;
+        const dfEl = row.querySelector('.load-df');
+        return {
+          id: def.id,
+          va: row.querySelector('.load-va')?.value || '',
+          voltage: row.querySelector('.load-voltage')?.value || '',
+          qty: row.querySelector('.load-qty')?.value || '0',
+          dfMode: row.querySelector('.df-auto') ? 'auto' : 'manual',
+          dfValue: dfEl?.value || '',
+          note: row.querySelector('.load-note')?.value || '',
+        };
+      }).filter(Boolean);
+    });
+
+    data.loads.custom = Array.from(
+      document.querySelectorAll('#custom-list .load-grid-row')
+    ).map(row => ({
+      desc: row.querySelector('.load-desc')?.value || '',
+      va: row.querySelector('.load-va')?.value || '',
+      voltage: row.querySelector('.load-voltage')?.value || '240',
+      qty: row.querySelector('.load-qty')?.value || '1',
+      df: row.querySelector('.load-df')?.value || '1.00',
+      note: row.querySelector('.load-note')?.value || '',
+    }));
+
+    data.panel = {
+      name: g('panel-name').value,
+      mainBreaker: g('panel-main-breaker').value,
+      slots: g('panel-slots').value,
+      voltage: g('panel-voltage').value,
+      bus: g('panel-bus').value,
+      location: g('panel-location').value,
+      L: PC.L.map(s => ({ num: s.num, type: s.type, desc: s.desc, amps: s.amps, va: s.va, tanB: s.tanB })),
+      R: PC.R.map(s => ({ num: s.num, type: s.type, desc: s.desc, amps: s.amps, va: s.va, tanB: s.tanB })),
+    };
+
+    const slug = (data.project.name || '')
+      .replace(/[^a-z0-9]+/gi, '_')
+      .toLowerCase()
+      .slice(0, 30)
+      .replace(/_$/, '') || 'project';
+    const defaultFilename = `${slug}-nec-load-calc.json`;
+    const filename = window.prompt('Save as:', defaultFilename);
+    if (filename === null) return;
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  load(file) {
+    const reader = new FileReader();
+    reader.onload = ev => {
+      let data;
+      try { data = JSON.parse(ev.target.result); } catch { alert('Invalid JSON file.'); return; }
+      if (data._app !== APP_ID) {
+        if (!confirm('This may not be a NEC Load Calc file. Import anyway?')) return;
+      }
+
+      const g = id => document.getElementById(id);
+      const sv = (id, v) => { const el = g(id); if (el && v != null) el.value = v; };
+      const p = data.project || {};
+      sv('proj-name', p.name);
+      sv('proj-address', p.address);
+      sv('proj-city', p.city);
+      sv('proj-zip', p.zip);
+      sv('proj-by', p.calculatedBy);
+      sv('sqft', p.sqft);
+      sv('service-size', p.serviceSize);
+      sv('panel-count', p.panelCount);
+      sv('sa-circuits', p.saCircuits);
+      sv('laundry-circuits', p.laundryCircuits);
+      sv('measured-kw', p.measuredKW);
+      sv('measured-add-va', p.measuredAddVA);
+      sv('occupancy', p.occupancy);
+      if (p.state) { g('proj-state').value = p.state; CM.detect(); }
+      sv('code-select', p.codeEdition);
+      if (p.voltageSystem) document.querySelector(`input[name="voltage"][value="${p.voltageSystem}"]`)?.click();
+      if (p.isNew !== undefined) document.querySelector(`input[name="new-existing"][value="${p.isNew ? 'new' : 'existing'}"]`)?.click();
+      if (p.calcMethod) document.querySelector(`input[name="calc-method"][value="${p.calcMethod}"]`)?.click();
+
+      const restoreSec = sec => {
+        (data.loads?.[sec] || []).forEach(saved => {
+          const row = document.querySelector(`#${sec}-list [data-id="${saved.id}"]`);
+          if (!row) return;
+          const s = (cls, v) => { const el = row.querySelector('.' + cls); if (el && v != null && v !== '') el.value = v; };
+          s('load-va', saved.va);
+          s('load-voltage', saved.voltage);
+          s('load-qty', saved.qty);
+          s('load-note', saved.note);
+          const dfEl = row.querySelector('.load-df');
+          if (dfEl && saved.dfValue) dfEl.value = saved.dfValue;
+          row.querySelector('.load-qty').dispatchEvent(new Event('input'));
+        });
+      };
+      restoreSec('fixed');
+      restoreSec('hvac');
+      restoreSec('special');
+
+      const customList = g('custom-list');
+      customList.innerHTML = '';
+      (data.loads?.custom || []).forEach(c => {
+        const row = LRB._customRow();
+        const s = (cls, v) => { const el = row.querySelector('.' + cls); if (el && v != null) el.value = v; };
+        s('load-desc', c.desc);
+        s('load-va', c.va);
+        s('load-voltage', c.voltage);
+        s('load-qty', c.qty);
+        s('load-df', c.df);
+        s('load-note', c.note);
+        customList.appendChild(row);
+        row.querySelector('.load-qty')?.dispatchEvent(new Event('input'));
+      });
+
+      if (data.panel) {
+        const pn = data.panel;
+        const sv2 = (id, v) => { const el = g(id); if (el && v != null && v !== '') el.value = v; };
+        sv2('panel-name', pn.name);
+        sv2('panel-main-breaker', pn.mainBreaker);
+        sv2('panel-slots', pn.slots);
+        sv2('panel-voltage', pn.voltage);
+        sv2('panel-bus', pn.bus);
+        sv2('panel-location', pn.location);
+        if (pn.L && pn.R && pn.slots) {
+          const half = parseInt(pn.slots) / 2;
+          PC.L = Array.from({ length: half }, (_, i) => ({ num: i * 2 + 1, side: 'L', type: '1P', desc: '', amps: '', va: '', tanB: null }));
+          PC.R = Array.from({ length: half }, (_, i) => ({ num: i * 2 + 2, side: 'R', type: '1P', desc: '', amps: '', va: '', tanB: null }));
+          pn.L.forEach(s => { const sl = PC.L.find(x => x.num === s.num); if (sl) Object.assign(sl, { type: s.type, desc: s.desc || '', amps: s.amps || '', va: s.va || '', tanB: s.tanB || null }); });
+          pn.R.forEach(s => { const sl = PC.R.find(x => x.num === s.num); if (sl) Object.assign(sl, { type: s.type, desc: s.desc || '', amps: s.amps || '', va: s.va || '', tanB: s.tanB || null }); });
+          PC._render();
+        }
+        const exportDate = data._exported ? new Date(data._exported) : new Date();
+        const dateStr = exportDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        const methodMap = { optional: 'Optional', standard: 'Standard', measured: 'Measured' };
+        document.getElementById('panel-project-header').style.display = '';
+        document.getElementById('pph-title').textContent = p.name || 'Residential Load Calculation';
+        const meta = [p.address, [p.city, p.state, p.zip].filter(Boolean).join(', ')].filter(Boolean);
+        document.getElementById('pph-meta').textContent = meta.join(' · ');
+        document.getElementById('pph-stamp').innerHTML =
+          `Code: ${p.codeEdition || ''}<br>Method: ${methodMap[p.calcMethod] || ''}<br>Date: ${dateStr}`;
+      }
+    };
+    reader.readAsText(file);
+  },
+};
+
+/* ── Save / Load button wiring (T-024) ─────────────────────────── */
+document.getElementById('btn-save').addEventListener('click', () => IO.save());
+document.getElementById('file-input').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (!f) return;
+  IO.load(f);
+  e.target.value = '';
+});
+
+/* ── Pre-populate button (T-020) ────────────────────────────────── */
+document.getElementById('btn-populate-panel').addEventListener('click', () => {
+  if (!lastResult) {
+    alert('Run a calculation first.');
+    return;
+  }
+  PC.populate(lastResult);
+});
+
+/* ── Print buttons (T-015 / T-021) ─────────────────────────────── */
+document.getElementById('btn-print-report').addEventListener('click', () => {
+  document.body.className = 'print-report';
+  window.print();
+  document.body.className = '';
+});
+
+document.getElementById('btn-print-panel').addEventListener('click', () => {
+  document.body.className = 'print-panel';
+  window.print();
+  document.body.className = '';
+});
+
+</script>
+</body>
+</html>
