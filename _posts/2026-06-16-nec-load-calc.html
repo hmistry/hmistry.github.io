@@ -169,6 +169,17 @@ table.ps-table tr.tandem-b-row td{border-top:1px dashed #b8c0d8}
 .empty-state{text-align:center;padding:40px 20px;color:var(--text-3)}
 .empty-state .icon{font-size:30px;margin-bottom:8px}
 
+/* Help tab */
+.help-content h2{font-size:15px;font-weight:600;color:var(--text);margin-bottom:10px}
+.help-content h3{font-size:12.5px;font-weight:600;color:var(--text-2);margin:14px 0 8px}
+.help-content .card{margin-bottom:18px}
+.help-content .card:last-child{margin-bottom:0}
+.help-content p.intro{font-size:12.5px;color:var(--text-2);margin-bottom:0}
+.help-content ul{padding-left:20px;font-size:12.5px;line-height:1.6}
+.help-content ul li{margin-bottom:4px}
+.help-content .calc-table td,.help-content .calc-table th{font-size:12px}
+.help-content .rule-of-thumb{margin-top:10px}
+
 @media print{
   body{background:#fff;font-size:10pt;--text-2: #1a1d24; --text-3: #444;}
   .top-bar,.tab-bar,.no-print,.action-bar{display:none!important}
@@ -178,6 +189,7 @@ table.ps-table tr.tandem-b-row td{border-top:1px dashed #b8c0d8}
   body.print-report #tab-panel,body.print-report #tab-inputs{display:none!important}
   body.print-panel #tab-report,body.print-panel #tab-inputs{display:none!important}
   table.ps-table td input,table.ps-table td select{border:none;background:transparent}
+  #tab-help{display:none!important}
 }
 </style>
 </head>
@@ -197,11 +209,12 @@ table.ps-table tr.tandem-b-row td{border-top:1px dashed #b8c0d8}
     <input type="file" id="file-input" accept=".json" style="display:none">
   </div>
 </div>
-<!--more-->
+
 <div class="tab-bar">
   <button class="tab-btn active" data-tab="inputs">Load Calculator</button>
   <button class="tab-btn" data-tab="report">Report <span class="tab-badge" id="report-badge" style="display:none">✓</span></button>
   <button class="tab-btn" data-tab="panel">Panel Schedule</button>
+  <button class="tab-btn" data-tab="help">Help</button>
 </div>
 
 <div class="main-wrap">
@@ -601,6 +614,179 @@ table.ps-table tr.tandem-b-row td{border-top:1px dashed #b8c0d8}
     </button>
     <span class="text-sm text-muted">Change Type to 2P/3P/Tandem — adjacent slots lock automatically.</span>
   </div>
+</div>
+
+<!-- TAB 4: Help -->
+<div class="tab-panel" id="tab-help">
+<div class="help-content">
+
+  <div class="card">
+    <div class="card-body">
+      <p class="intro">This guide answers the practical question: <em>"what do I actually type into the calculator?"</em></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">1. Quick Reference — Terms &amp; When to Use Them</div></div>
+    <div class="card-body">
+      <table class="calc-table">
+        <thead>
+          <tr><th>Term</th><th>Definition</th><th>Use in calculator?</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Gross / outside sq ft</strong></td>
+            <td>Measured from exterior wall surfaces, per floor, summed across floors. Excludes garages, unfinished basements, open porches.</td>
+            <td>✅ Use this — it's what NEC 220.12 wants. Round up slightly when uncertain.<br>❌ Don't include garages, unfinished basements, or open porches.</td>
+          </tr>
+          <tr>
+            <td><strong>Living / listing sq ft</strong></td>
+            <td>Interior finished space only (what real estate listings quote)</td>
+            <td>❌ Don't use directly — usually smaller than gross</td>
+          </tr>
+          <tr>
+            <td><strong>Nominal Voltage System — 120/240V</strong></td>
+            <td>Standard single-phase residential service</td>
+            <td>✅ Default for virtually all single-family homes, townhouses, and duplexes on a typical utility transformer drop</td>
+          </tr>
+          <tr>
+            <td><strong>Nominal Voltage System — 120/208V</strong></td>
+            <td>Appears when a dwelling unit is fed from a 3-phase building service</td>
+            <td>✅ Use only for an individual unit in a multi-family building with 3-phase service (apartments/condos). If unsure, it's 240V.</td>
+          </tr>
+          <tr>
+            <td><strong>Optional Method (NEC 220.82)</strong></td>
+            <td>Simpler, fewer steps, generally a smaller calculated load than Standard Method</td>
+            <td>✅ Default choice — new construction or existing home, no special circumstances</td>
+          </tr>
+          <tr>
+            <td><strong>Standard Method (NEC 220.40+)</strong></td>
+            <td>Granular, item-by-item demand factors</td>
+            <td>✅ Use when Optional Method doesn't qualify, or AHJ requires line-item detail (common for additions/partial renovations)</td>
+          </tr>
+          <tr>
+            <td><strong>Measured Load Method (NEC 220.87)</strong></td>
+            <td>Uses 12 months of actual utility/AMI demand data instead of theoretical worst-case loads</td>
+            <td>✅ Existing homes only, when you have utility data and want to avoid an oversized service upgrade</td>
+          </tr>
+          <tr>
+            <td><strong>Small Appliance Circuits</strong></td>
+            <td>A dedicated 20A, 120V circuit serving <em>only</em> receptacles in the kitchen, pantry, breakfast room, or dining room — no lighting, no other rooms</td>
+            <td>✅ Count dedicated circuits, not appliances or outlets. Minimum 2; larger kitchens sometimes 3.<br>❌ Don't total up wattage of what's plugged in — NEC already assumes 1,500 VA/circuit.</td>
+          </tr>
+          <tr>
+            <td><strong>Laundry Circuits</strong></td>
+            <td>A dedicated 20A, 120V circuit serving the laundry area's receptacle(s) — typically the washer and/or a gas dryer's 120V plug</td>
+            <td>✅ Count dedicated circuits only.<br>❌ The 240V electric dryer outlet is never part of this count — that goes in Fixed Appliances.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">2. Quick Decision Table — "Where Does X Go?"</div></div>
+    <div class="card-body">
+      <table class="calc-table">
+        <thead>
+          <tr><th>If it's...</th><th>Goes in...</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>General lighting, any room</td><td>Nowhere — sq ft × 3 VA covers it</td></tr>
+          <tr><td>Bedroom / hallway / bathroom receptacles</td><td>Nowhere — sq ft × 3 VA covers it</td></tr>
+          <tr><td>Kitchen/dining countertop receptacle circuit</td><td><strong>Small Appliance Circuits</strong> count</td></tr>
+          <tr><td>Toaster, blender, coffee maker, mixer (plugged into a SA circuit)</td><td>Nowhere extra — already covered by the SA circuit's 1,500 VA allowance</td></tr>
+          <tr><td>Refrigerator</td><td>⚠️ Depends on local AHJ — often its own dedicated circuit, not an SA circuit. If dedicated, treat as <strong>Custom Loads</strong> (nameplate VA) or per local rule; verify before defaulting to SA count</td></tr>
+          <tr><td>Washer's 120V receptacle</td><td><strong>Laundry Circuits</strong> count</td></tr>
+          <tr><td>Gas dryer's 120V plug (motor/controls/igniter)</td><td><strong>Laundry Circuits</strong> count — same circuit as washer keeps count at 1; separate dedicated 120V breaker bumps it to 2</td></tr>
+          <tr><td>Second laundry area / utility sink, own dedicated circuit</td><td><strong>Laundry Circuits</strong> count, +1</td></tr>
+          <tr><td>Electric dryer (240V)</td><td><strong>Fixed Appliances → Dryer</strong></td></tr>
+          <tr><td>Electric range / cooktop / wall oven</td><td><strong>Fixed Appliances</strong> → respective row, nameplate VA</td></tr>
+          <tr><td>Gas range / gas wall oven</td><td><strong>Fixed Appliances</strong> → respective row — use the unit's electrical nameplate (igniter/controls only, typically 200–600 VA), not the gas BTU rating. If nameplate isn't available, qty = 0 with a note explaining the omission is acceptable given the small magnitude</td></tr>
+          <tr><td>Dishwasher, disposal, built-in microwave</td><td><strong>Fixed Appliances</strong> → respective row</td></tr>
+          <tr><td>Water heater (electric)</td><td><strong>Fixed Appliances → Water Heater</strong></td></tr>
+          <tr><td>A/C, heat pump, furnace blower, strip heat</td><td><strong>HVAC Loads</strong> (largest load counted automatically per NEC 220.60)</td></tr>
+          <tr><td>EV charger, hot tub, pool pump, sauna, solar PV, battery storage, workshop subpanel</td><td><strong>Special Loads</strong></td></tr>
+          <tr><td>Garage lighting/receptacles (typical — a few fixtures, 1–2 GFCI outlets)</td><td><strong>Custom Loads</strong> — small flat entry, ~500–800 VA, qty 1, DF 1.0</td></tr>
+          <tr><td>Garage with EV charger, workshop equipment, or a freezer</td><td><strong>Special Loads</strong> (EV/Workshop) or <strong>Custom Loads</strong> (freezer) — not the flat garage allowance above</td></tr>
+          <tr><td>GFCI/AFCI-protected circuit</td><td>Nowhere extra — it's still whatever category it normally is. Note "GFCI"/"AFCI" in the description field for documentation only</td></tr>
+          <tr><td>Low-voltage security / doorbell / thermostat</td><td>Nowhere — immaterial (typically &lt;50 VA), skip</td></tr>
+          <tr><td>Installed-but-unused circuit (e.g. spare 240V dryer outlet, gas dryer in service)</td><td>qty = 0, with a note documenting why it's unused</td></tr>
+          <tr><td>Anything unusual not covered above</td><td><strong>Custom Loads</strong>, with nameplate VA and a note explaining what it is</td></tr>
+        </tbody>
+      </table>
+
+      <h3>HVAC equipment — finding the right VA value</h3>
+      <table class="calc-table">
+        <thead>
+          <tr><th>Equipment</th><th>Where to find VA</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>A/C condenser / compressor</td><td>Nameplate <strong>RLA</strong> (Rated Load Amps) × volts</td><td>Don't use MCA — it already includes a safety margin; using it double-counts</td></tr>
+          <tr><td>Heat pump (heating mode)</td><td>Same as A/C — nameplate RLA × volts</td><td>Aux/strip heat is a <em>separate</em> row</td></tr>
+          <tr><td>Gas furnace, electric blower</td><td>Nameplate blower motor <strong>FLA</strong> × 120V</td><td>Almost all gas furnaces have one — typically 540–1,020 VA</td></tr>
+          <tr><td>Pure gas heat, no electric blower (rare)</td><td>N/A</td><td>qty = 0, nothing to enter</td></tr>
+          <tr><td>Electric resistance heat / strip heat</td><td>Nameplate kW of elements</td><td>kW ≈ VA since resistive, PF ≈ 1</td></tr>
+          <tr><td>System has no match (e.g. gas furnace + no separate A/C)</td><td>—</td><td>Leave unused rows at qty = 0; the HVAC section is excluded entirely if all rows are 0</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">3. Solar PV and Battery Storage</div></div>
+    <div class="card-body">
+      <p class="text-sm" style="margin-bottom:8px;">How these are treated:</p>
+      <ul>
+        <li><strong>Solar PV (NEC 220.5 / 705):</strong> Modeled as a load <strong>offset</strong> — enter the inverter's continuous output rating (not panel STC wattage) and the calculator applies a −100% demand factor, subtracting it from total calculated load. This reflects on-site generation reducing net service demand. Caveat: this is simplified for load-calc purposes only — actual interconnection compliance (705.12 load-side/supply-side taps, the 120% busbar rule) is a separate review, not handled by this offset.</li>
+        <li><strong>Battery Storage (NEC 706):</strong> Modeled as a standard <strong>+100% load</strong> — the charging circuit draws from the panel regardless of how the battery is later used. Enter the charger's nameplate input rating, not the battery's kWh capacity.</li>
+        <li><strong>Both together:</strong> Enter both. Solar nets out load; battery still adds its charging draw. Don't assume the pairing nets to zero — the battery's charging circuit pulls from the panel independently of solar production timing.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">4. Custom Loads — Determining the Demand Factor</div></div>
+    <div class="card-body">
+      <p class="text-sm" style="margin-bottom:8px;">There's no NEC table for miscellaneous/custom loads, so this is an engineering judgment call:</p>
+      <ul>
+        <li><strong>Default to 1.0 (100%)</strong> — conservative and defensible; most AHJs accept it without question.</li>
+        <li><strong>Use below 1.0 only with justification</strong> — e.g. a cyclical load that never runs simultaneously with other major loads, or a citable NEC article (motors under Article 430 have their own demand provisions).</li>
+        <li><strong>Never guess low just to shrink the total</strong> — NEC demand factors reflect codified diversity assumptions, not personal estimates of duty cycle.</li>
+        <li><strong>Document any non-1.0 value in the Note field</strong> — e.g. "Continuous-duty motor, Art. 430.22 — 125% applied" or "Intermittent sump pump, per local AHJ allowance." This is the first thing a reviewer will question.</li>
+      </ul>
+      <p class="text-sm rule-of-thumb"><strong>Rule of thumb:</strong> if in doubt, use 1.0. It's always defensible; anything lower needs a citation.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">5. General Do's and Don'ts</div></div>
+    <div class="card-body">
+      <h3>Do:</h3>
+      <ul>
+        <li>Use nameplate/data-plate values wherever a specific appliance is involved</li>
+        <li>Use RLA (not MCA) for compressor motors; use FLA for blower/fan motors</li>
+        <li>Count <em>circuits</em>, not appliances, for Small Appliance and Laundry fields</li>
+        <li>Treat a gas range/oven's igniter-and-controls load as a real (if small) Fixed Appliance entry, not an automatic zero</li>
+        <li>Document spare/unused circuits and any non-default demand factor in the Note field rather than omitting silently</li>
+        <li>Round gross sq ft up slightly when uncertain</li>
+        <li>Enter both solar PV and battery storage if paired — don't assume they net to zero</li>
+        <li>Default Custom Load demand factor to 1.0 unless you have a specific, citable reason to lower it</li>
+      </ul>
+      <h3>Don't:</h3>
+      <ul>
+        <li>Double-count a circuit in both the SA/Laundry dropdowns and as a Custom Load</li>
+        <li>Add VA for anything already covered by the sq ft × 3 VA general allowance (general lighting/receptacles, low-voltage systems)</li>
+        <li>Use MCA where RLA is the correct figure</li>
+        <li>Count an unused/spare circuit's load when calculating present-day actual demand — note it instead</li>
+        <li>Try to fold the garage's square footage into the main sq ft field</li>
+        <li>Add a line item just because a circuit is GFCI/AFCI-protected — protection method ≠ load category</li>
+        <li>Lower a Custom Load's demand factor below 1.0 without a citation or clear written justification</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
 </div>
 
 </div><!-- main-wrap -->
