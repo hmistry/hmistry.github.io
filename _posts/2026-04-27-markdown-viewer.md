@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Markdown Viewer
-date:   2026-04-27
+date: 2026-04-27
 categories: software
-tags: html app
+tags: app
 excerpt_separator: <!--more-->
 ---
 
@@ -29,11 +29,10 @@ I vibe coded with Claude AI a self-contained, local HTML file that will render a
 - Code file support — view source code files with syntax highlighting applied
 - Print-ready — optimized font sizes and margins, color highlighted code
 
-Download `markdown-viewer.html` from [Markdown Viewer Repo][markdown-viewer], open it in any browser, drop in a `.md` or code file.
+Click here to open the [Markdown Viewer]({{ '/pages/markdown-viewer.html' | relative_url }}){:target="_blank" rel="noopener"} in any browser, drop in a `.md` or code file to view a printer-friendly styled version of the file.
 
 ## Screenshots
 
 ![Markdown in light mode and code in dark mode][markdownCodeScreenshot]
 
-[markdown-viewer]:(https://github.com/hmistry/markdown-viewer)
 [markdownCodeScreenshot]: <{{ site.baseurl }}/assets/images/md-viewer-sm.png>
